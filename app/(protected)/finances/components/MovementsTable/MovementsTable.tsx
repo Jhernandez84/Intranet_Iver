@@ -1,3 +1,5 @@
+import { Dropdown, DropdownItem, DropdownDivider } from "flowbite-react";
+
 export default function MovementsTable() {
   return (
     <div className="relative rounded shadow-md sm:rounded-lg">
@@ -6,7 +8,21 @@ export default function MovementsTable() {
           <thead className="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-900 dark:text-gray-400">
             <tr>
               <th className="sticky top-0 z-10 w-1/4 bg-gray-50 px-6 py-3 dark:bg-gray-900">
-                Product name
+                <Dropdown
+                  className="uppercase"
+                  label="Producto"
+                  inline
+                  dismissOnClick={true}
+                >
+                  <DropdownItem>Ordenar A-Z</DropdownItem>
+                  <DropdownItem>Ordenar Z-A</DropdownItem>
+                  <DropdownDivider />
+
+                  <DropdownItem>Dashboard</DropdownItem>
+                  <DropdownItem>Settings</DropdownItem>
+                  <DropdownItem>Earnings</DropdownItem>
+                  <DropdownItem>Sign out</DropdownItem>
+                </Dropdown>{" "}
               </th>
               <th className="sticky top-0 z-10 w-1/4 bg-gray-50 px-6 py-3 dark:bg-gray-900">
                 Color
