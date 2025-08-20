@@ -1,4 +1,13 @@
+"use client";
+
+import { initFlowbite } from "flowbite";
+import { useEffect } from "react";
+
 export default function CardComponent() {
+  useEffect(() => {
+    initFlowbite();
+  }, []);
+
   return (
     <>
       <div>
