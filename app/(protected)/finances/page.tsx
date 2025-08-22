@@ -5,36 +5,33 @@ import { useUser } from "../../context/UserProvider";
 import CardComponent from "./components/CardComponent/CardComponent";
 import FinanceBarChart from "./components/ChartComponent/FinanceChartComponent";
 
-import MovementsTable from "./components/MovementsTable/MovementsTable";
-
 export default function DashboardPage() {
   const user = useUser();
 
   console.log(user);
 
   return (
-    <div className="m-2 grid h-[87vh] grid-rows-[60%_40%] gap-4">
+    <div className="grid h-[calc(100vh-70px)] grid-rows-[60%_40%] gap-2">
       {/* Primera fila (60%) */}
       <div className="grid h-full grid-cols-[60%_40%] gap-2">
         {/* Gráfico a la izquierda */}
-        <div className="h-full w-full">
+        <div className="h-[100%] w-full">
           <FinanceBarChart />
         </div>
 
-        {/* Dos cards a la derecha */}
-        <div className="grid h-full w-full grid-rows-2 gap-2">
-          <div className="h-full w-full">
+        {/* 3 cards a la derecha */}
+        <div className="grid h-full w-full grid-rows-3 gap-2">
+          <div className="h-full w-full pr-2">
             <CardComponent />
           </div>
-          <div className="h-full w-full">
+          <div className="h-full w-full pr-2">
+            <CardComponent />
+          </div>
+
+          <div className="h-full w-full pr-2">
             <CardComponent />
           </div>
         </div>
-      </div>
-
-      {/* Segunda fila (40%) */}
-      <div className="h-full w-full overflow-hidden">
-        <MovementsTable />
       </div>
     </div>
   );

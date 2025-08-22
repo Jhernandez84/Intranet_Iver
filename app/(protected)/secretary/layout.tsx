@@ -7,7 +7,7 @@ export default async function SecretaryLayout({
 }) {
   return (
     <>
-      <div className="h-[91.7vh] p-2 md:flex">
+      <div className="h-[calc(100vh-70px)] p-2 md:flex">
         <div className="text-medium w-full rounded-lg bg-gray-50 p-4 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
           <button
             id="toggleSidebar"

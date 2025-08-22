@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import ApexCharts from "apexcharts";
+import { Dropdown, DropdownItem } from "flowbite-react";
 
 const FinanceBarChart = () => {
   const chartRef = useRef<ApexCharts | null>(null);
@@ -13,17 +14,17 @@ const FinanceBarChart = () => {
         {
           name: "Income",
           color: "#31C48D",
-          data: [1420, 1620, 1820],
+          data: [1420, 1620, 1820, 1420, 1620, 1820],
         },
         {
           name: "Expense",
           color: "#F05252",
-          data: [788, 810, 866],
+          data: [788, 810, 866, 620, 720, 900],
         },
       ],
       chart: {
         type: "bar",
-        height: 320,
+        // height: 300,
         toolbar: { show: false },
         sparkline: { enabled: false },
       },
@@ -55,7 +56,7 @@ const FinanceBarChart = () => {
         },
       },
       xaxis: {
-        categories: ["Jul", "Aug", "Sep"],
+        categories: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dic"],
         labels: {
           show: true,
           formatter: (value: string) => `$${value}`,
@@ -98,7 +99,7 @@ const FinanceBarChart = () => {
   }, []);
 
   return (
-    <div className="h-full w-full rounded-lg bg-white p-4 shadow-sm md:p-6 dark:bg-gray-900">
+    <div className="w-full rounded-lg bg-white shadow-sm md:p-6 dark:bg-gray-900">
       <div className="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
         <dl>
           <dt className="pb-1 text-base font-normal text-gray-500 dark:text-gray-400">
@@ -131,28 +132,22 @@ const FinanceBarChart = () => {
 
       <div ref={chartElRef} id="finance-bar-chart" />
 
-      <div className="grid grid-cols-1 items-center justify-between border-t border-gray-200 dark:border-gray-700">
+      <div className="grid grid-cols-2 items-center justify-between border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between pt-5">
-          <button
-            className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-            type="button"
+          <Dropdown
+            label=""
+            dismissOnClick={true}
+            renderTrigger={() => <span>My custom trigger</span>}
+            className="inline-flex items-center rounded-lg pt-5 text-sm font-semibold text-blue-600 uppercase hover:bg-gray-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-blue-500"
           >
-            Last 6 months
-            <svg
-              className="m-2.5 ms-1.5 w-2.5"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 6"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 4 4 4-4"
-              />
-            </svg>
-          </button>
+            <DropdownItem>Dashboard</DropdownItem>
+            <DropdownItem>Settings</DropdownItem>
+            <DropdownItem>Earnings</DropdownItem>
+            <DropdownItem>Sign out</DropdownItem>
+          </Dropdown>
+        </div>
+
+        <div className="flex items-center justify-between pt-5">
           <a
             href="#"
             className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold text-blue-600 uppercase hover:bg-gray-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-blue-500"

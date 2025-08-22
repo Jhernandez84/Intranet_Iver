@@ -6,8 +6,11 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <div className="flex-1 bg-gray-700">{children}</div>
-    </>
+    <div className="grid h-full min-h-0">
+      {/* Panel izquierdo: su propio scroll (si la lista crece) */}
+
+      {/* Panel derecho: scroll principal de la zona protegida */}
+      <main className="min-h-0 overflow-auto">{children}</main>
+    </div>
   );
 }

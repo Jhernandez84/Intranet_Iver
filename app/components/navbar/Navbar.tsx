@@ -5,6 +5,7 @@ import React from "react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import AppsMenu from "../../(protected)/components/apps/Apps";
+import Apps2Menu from "../../(protected)/components/apss22/Apps2";
 import NotificationList from "../../(protected)/components/notifications/notifications";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import AuthButton from "../authcomponents/AuthButton";
@@ -35,7 +36,7 @@ const Navbar = () => {
     <div className="sticky top-0 z-50 w-[100vw]">
       {/* <header className="antialiased"> */}
 
-      <nav className="border-gray-200 bg-white px-4 py-2.5 lg:px-6 dark:bg-gray-800">
+      <nav className="h-[70px] border-gray-200 bg-white px-4 py-2.5 lg:px-6 dark:bg-gray-800">
         <div className="flex flex-wrap items-center justify-between">
           <div className="flex items-center justify-center">
             {!spuser ? (
@@ -225,7 +226,8 @@ const Navbar = () => {
                 {/* <!-- Notifications --> */}
                 <NotificationList />
                 {/* <!-- Apps --> */}
-                <AppsMenu />
+                {/* <AppsMenu /> */}
+                <Apps2Menu />
               </>
             ) : (
               []

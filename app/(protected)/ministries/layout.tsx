@@ -60,7 +60,7 @@ export default function MinistriesLayout({
 
   return (
     <>
-      <div className="h-[91.7vh] p-2 md:flex">
+      <div className="h-[calc(100vh-70px)] p-2 md:flex">
         <ul className="flex-column space-y mb-4 space-y-4 text-sm font-medium text-gray-500 md:me-4 md:mb-0 dark:text-gray-400">
           {MinistryAccess.map((access) => {
             const isActive = pathname === access.hRef;

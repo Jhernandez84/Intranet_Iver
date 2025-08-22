@@ -3,7 +3,7 @@ import { Dropdown, DropdownItem, DropdownDivider } from "flowbite-react";
 export default function MovementsTable() {
   return (
     <div className="relative rounded shadow-md sm:rounded-lg">
-      <div className="max-h-[250px] overflow-y-auto">
+      <div className="h-[500px] overflow-y-auto">
         <table className="w-full table-fixed text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
           <thead className="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-900 dark:text-gray-400">
             <tr>

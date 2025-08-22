@@ -41,7 +41,7 @@ export default function CoffeeLayout({
 
   return (
     <>
-      <div className="h-[91.7vh] p-2 md:flex">
+      <div className="h-[calc(100vh-70px)] p-2 md:flex">
         <ul className="active flex-column space-y mb-4 space-y-4 text-sm font-medium text-gray-500 md:me-4 md:mb-0 dark:text-gray-400">
           <button
             id="toggleSidebar"
@@ -85,7 +85,7 @@ export default function CoffeeLayout({
               <li key={access.hRef}>
                 <Link href={access.hRef} className={linkClasses}>
                   <svg
-                    className="me-2 size-6 h-4 w-6 text-gray-500 dark:text-gray-400"
+                    className="me-2 size-4 h-4 w-4 text-gray-500 dark:text-gray-400"
                     aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -105,7 +105,7 @@ export default function CoffeeLayout({
           </div>
           <div className="m-0 p-0">
             <Dropdown
-              className="mt-2 w-[180px] cursor-pointer"
+              className="mt-2 cursor-pointer"
               label="Este mes"
               dismissOnClick={true}
             >
@@ -126,12 +126,11 @@ export default function CoffeeLayout({
                 Rango de Fecha
               </DropdownItem>
             </Dropdown>
-            <Datepicker className="w-[180px] pt-2 pb-2" disabled={!switch1} />
+            {/* <Datepicker className="w-[180px] pt-2 pb-2" disabled={!switch1} />
             {/* <p className="">Hasta</p> */}
-            <Datepicker className="w-[180px] pt-2 pb-2" disabled={!switch1} />
           </div>
           <Dropdown
-            className="mt-2 w-[180px] cursor-pointer"
+            className="mt-2 w-[150px] cursor-pointer"
             label="Estado"
             dismissOnClick={true}
           >
@@ -141,7 +140,7 @@ export default function CoffeeLayout({
             <DropdownItem>Sign out</DropdownItem>
           </Dropdown>
           <Dropdown
-            className="mt-2 w-[180px] cursor-pointer"
+            className="mt-2 w-[150px] cursor-pointer"
             label="Sede"
             dismissOnClick={false}
           >
@@ -150,28 +149,8 @@ export default function CoffeeLayout({
             <DropdownItem>Earnings</DropdownItem>
             <DropdownItem>Sign out</DropdownItem>
           </Dropdown>
-          <Dropdown
-            className="mt-2 w-[180px] cursor-pointer"
-            label="Observación"
-            dismissOnClick={false}
-          >
-            <DropdownItem>Dashboard</DropdownItem>
-            <DropdownItem>Settings</DropdownItem>
-            <DropdownItem>Earnings</DropdownItem>
-            <DropdownItem>Sign out</DropdownItem>
-          </Dropdown>
-          <Dropdown
-            className="mt-2 w-[180px] cursor-pointer"
-            label="Observación"
-            dismissOnClick={false}
-          >
-            <DropdownItem>Dashboard</DropdownItem>
-            <DropdownItem>Settings</DropdownItem>
-            <DropdownItem>Earnings</DropdownItem>
-            <DropdownItem>Sign out</DropdownItem>
-          </Dropdown>
         </ul>
-        <div className="text-medium w-full rounded-lg bg-gray-50 p-6 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+        <div className="text-medium w-full rounded-lg bg-gray-50 p-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
           {children}
         </div>
       </div>

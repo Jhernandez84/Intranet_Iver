@@ -81,7 +81,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="contact" className="py-20">
+      <section id="contact" className="bg-white py-20">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-gray-900">
             ¿Listo para empezar?

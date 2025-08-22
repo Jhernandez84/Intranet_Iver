@@ -12,8 +12,6 @@ import { CompanyBranchesProvider } from "./context/CompanyBranchesProvider";
 import { UserAccessProvider } from "./context/UserAccessProvider";
 
 import "./globals.css";
-import Sidebar from "./(protected)/components/sidebar/Sidebar";
-import AppsMenu from "./(protected)/components/apps/Apps";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,10 +54,17 @@ export default async function RootLayout({
               <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
               >
-                <ThemeInit />
-                <Navbar />
+                {/* Navbar fijo en la primera fila */}
+                <div className="sticky top-0 z-50 h-[var(--navbar-h)]">
+                  <Navbar />
+                </div>
 
-                {children}
+                {/* Contenido con scroll propio */}
+                <main className="h-[calc(100vh-70px)] w-full bg-gray-500 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                  {/* Si tienes Sidebar/AppsMenu dentro del contenido, envuélvelos aquí */}
+                  {/* <Sidebar /> / <AppsMenu /> si aplica */}
+                  <div>{children}</div>
+                </main>
               </body>
             </html>
           </CompanyBranchesProvider>

@@ -6,7 +6,7 @@ import MovementsTable from "../components/MovementsTable/MovementsTable";
 export default function DashboardFinance() {
   return (
     <>
-      <div className="m-2 grid h-[87vh] grid-rows-[25%_60%] gap-4">
+      <div className="grid h-[calc(100vh-70px)] grid-rows-[30%_60%] gap-2">
         <div>
           <div className="grid h-full w-full grid-cols-2 gap-2">
             {/* <div className="h-full w-full"> */}
