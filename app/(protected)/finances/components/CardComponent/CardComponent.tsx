@@ -2,11 +2,25 @@
 
 import { initFlowbite } from "flowbite";
 import { useEffect } from "react";
+import { useFinanceData } from "../../_Context/FinancesProvider";
+import { getTotalsByTipo } from "../../helper/FinanceDataOutputs";
+import { formatCurrency } from "../../helper/FinanceDataOutputs";
+
+interface CardComponentProps {
+  label: string;
+}
 
 export default function CardComponent() {
   useEffect(() => {
     initFlowbite();
   }, []);
+
+  const { financeMovements, isLoadingFinanceData } = useFinanceData();
+  const safeData = financeMovements ?? [];
+
+  const totals = getTotalsByTipo(safeData);
+
+  if (isLoadingFinanceData) return;
 
   return (
     <>
@@ -17,7 +31,7 @@ export default function CardComponent() {
               Movimientos último mes
             </dt>
             <dd className="text-3xl leading-none font-bold text-gray-900 dark:text-white">
-              $5,405
+              {formatCurrency(totals.total)}
             </dd>
           </dl>
           <div>
@@ -48,7 +62,7 @@ export default function CardComponent() {
               Ingresos
             </dt>
             <dd className="text-xl leading-none font-bold text-green-500 dark:text-green-400">
-              $23,635
+              {formatCurrency(totals.ingresos)}
             </dd>
           </dl>
           <dl>
@@ -56,7 +70,7 @@ export default function CardComponent() {
               Gastos
             </dt>
             <dd className="text-xl leading-none font-bold text-red-600 dark:text-red-500">
-              -$18,230
+              {formatCurrency(totals.egresos)}
             </dd>
           </dl>
         </div>

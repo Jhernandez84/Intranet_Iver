@@ -4,22 +4,33 @@ import { useEffect, useRef } from "react";
 import ApexCharts from "apexcharts";
 import { Dropdown, DropdownItem } from "flowbite-react";
 
+import { useFinanceData } from "../../_Context/FinancesProvider";
+import { groupByMesTipoForChartPretty } from "../../helper/FinanceDataOutputs";
+import { getTotalsByTipo } from "../../helper/FinanceDataOutputs";
+import { formatCurrency } from "../../helper/FinanceDataOutputs";
+
 const FinanceBarChart = () => {
   const chartRef = useRef<ApexCharts | null>(null);
   const chartElRef = useRef<HTMLDivElement | null>(null);
+
+  const { financeMovements, isLoadingFinanceData } = useFinanceData();
+  const safeData = financeMovements ?? [];
+
+  const { series, categories } = groupByMesTipoForChartPretty(safeData);
+  const Balance = getTotalsByTipo(safeData);
 
   useEffect(() => {
     const options = {
       series: [
         {
-          name: "Income",
+          name: series[0].name,
           color: "#31C48D",
-          data: [1420, 1620, 1820, 1420, 1620, 1820],
+          data: series[0].data,
         },
         {
-          name: "Expense",
+          name: series[1].name,
           color: "#F05252",
-          data: [788, 810, 866, 620, 720, 900],
+          data: series[1].data,
         },
       ],
       chart: {
@@ -52,14 +63,14 @@ const FinanceBarChart = () => {
         shared: true,
         intersect: false,
         y: {
-          formatter: (value: number) => `$${value}`,
+          formatter: (value: number) => `${formatCurrency(value)}`,
         },
       },
       xaxis: {
-        categories: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dic"],
+        categories: categories,
         labels: {
           show: true,
-          formatter: (value: string) => `$${value}`,
+          formatter: (value: number) => `${formatCurrency(value / 1000000)}mln`,
           style: {
             fontFamily: "Inter, sans-serif",
             cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
@@ -96,17 +107,17 @@ const FinanceBarChart = () => {
     return () => {
       chartRef.current?.destroy();
     };
-  }, []);
+  }, [financeMovements, isLoadingFinanceData]);
 
   return (
     <div className="w-full rounded-lg bg-white shadow-sm md:p-6 dark:bg-gray-900">
       <div className="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
         <dl>
           <dt className="pb-1 text-base font-normal text-gray-500 dark:text-gray-400">
-            Profit
+            Saldo a la fecha
           </dt>
           <dd className="text-3xl leading-none font-bold text-gray-900 dark:text-white">
-            $5,405
+            {formatCurrency(Balance.total)}
           </dd>
         </dl>
         <div>
