@@ -10,8 +10,9 @@ import {
   CompanyFinanceProvider,
   useFinanceData,
 } from "./_Context/FinancesProvider";
+import FinanceEntryDataForm from "./components/FinanceEntryData/FinanceEntryDataForm";
 
-export default function CoffeeLayout({
+export default function FinancesLayout({
   children,
 }: {
   children: React.ReactNode;

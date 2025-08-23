@@ -2,15 +2,26 @@
 
 import { initFlowbite } from "flowbite";
 import { useEffect } from "react";
+import { ReactNode } from "react";
 import { useFinanceData } from "../../_Context/FinancesProvider";
 import { getTotalsByTipo } from "../../helper/FinanceDataOutputs";
 import { formatCurrency } from "../../helper/FinanceDataOutputs";
+import {
+  getDateRange,
+  type DateRangeKey,
+} from "../../helper/FinanceDataOutputs";
 
 interface CardComponentProps {
   label: string;
+  period: DateRangeKey;
+  actionButton?: ReactNode; // 👈 Aquí pasas el botón u otro elemento
 }
 
-export default function CardComponent() {
+export default function CardComponent({
+  label,
+  period,
+  actionButton,
+}: CardComponentProps) {
   useEffect(() => {
     initFlowbite();
   }, []);
@@ -18,7 +29,9 @@ export default function CardComponent() {
   const { financeMovements, isLoadingFinanceData } = useFinanceData();
   const safeData = financeMovements ?? [];
 
-  const totals = getTotalsByTipo(safeData);
+  const { fechaDesde, fechaHasta } = getDateRange(period);
+
+  const totals = getTotalsByTipo(safeData, { fechaDesde, fechaHasta });
 
   if (isLoadingFinanceData) return;
 
@@ -28,31 +41,36 @@ export default function CardComponent() {
         <div className="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
           <dl>
             <dt className="pb-1 text-base font-normal text-gray-500 dark:text-gray-400">
-              Movimientos último mes
+              {label}
             </dt>
             <dd className="text-3xl leading-none font-bold text-gray-900 dark:text-white">
               {formatCurrency(totals.total)}
             </dd>
           </dl>
           <div>
-            <span className="inline-flex items-center rounded-md bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
-              <svg
-                className="me-1.5 h-2.5 w-2.5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 14"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13V1m0 0L1 5m4-4 4 4"
-                />
-              </svg>
-              Profit rate 23.5%
-            </span>
+            {actionButton && <div>{actionButton}</div>}
+
+            {/* 👉 renderiza el botón */}
+            {!actionButton && (
+              <span className="inline-flex items-center rounded-md bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
+                <svg
+                  className="me-1.5 h-2.5 w-2.5"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 14"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13V1m0 0L1 5m4-4 4 4"
+                  />
+                </svg>
+                Profit rate 23.5%
+              </span>
+            )}
           </div>
         </div>
 
@@ -74,9 +92,7 @@ export default function CardComponent() {
             </dd>
           </dl>
         </div>
-        <div className="grid grid-cols-1 items-center justify-between border-t border-gray-200 dark:border-gray-700">
-          Detalle de los principales movimientos
-        </div>
+        <div className="grid grid-cols-1 items-center justify-between border-t border-gray-200 dark:border-gray-700"></div>
       </div>
     </>
   );

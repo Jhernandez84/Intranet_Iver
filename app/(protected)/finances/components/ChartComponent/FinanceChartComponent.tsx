@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ApexCharts from "apexcharts";
 import { Dropdown, DropdownItem } from "flowbite-react";
+import { initFlowbite } from "flowbite";
 
 import { useFinanceData } from "../../_Context/FinancesProvider";
 import { groupByMesTipoForChartPretty } from "../../helper/FinanceDataOutputs";
 import { getTotalsByTipo } from "../../helper/FinanceDataOutputs";
 import { formatCurrency } from "../../helper/FinanceDataOutputs";
+import {
+  getDateRange,
+  type DateRangeKey,
+} from "../../helper/FinanceDataOutputs";
 
 const FinanceBarChart = () => {
   const chartRef = useRef<ApexCharts | null>(null);
@@ -15,9 +20,12 @@ const FinanceBarChart = () => {
 
   const { financeMovements, isLoadingFinanceData } = useFinanceData();
   const safeData = financeMovements ?? [];
+  const [dateRange, setDateRange] = useState<DateRangeKey>("WTD");
+
+  const { fechaDesde, fechaHasta } = getDateRange(dateRange);
 
   const { series, categories } = groupByMesTipoForChartPretty(safeData);
-  const Balance = getTotalsByTipo(safeData);
+  const Balance = getTotalsByTipo(safeData, { fechaDesde, fechaHasta });
 
   useEffect(() => {
     const options = {
@@ -109,12 +117,16 @@ const FinanceBarChart = () => {
     };
   }, [financeMovements, isLoadingFinanceData]);
 
+  useEffect(() => {
+    initFlowbite();
+  }, []);
+
   return (
     <div className="w-full rounded-lg bg-white shadow-sm md:p-6 dark:bg-gray-900">
       <div className="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
         <dl>
           <dt className="pb-1 text-base font-normal text-gray-500 dark:text-gray-400">
-            Saldo a la fecha
+            Balance {dateRange}
           </dt>
           <dd className="text-3xl leading-none font-bold text-gray-900 dark:text-white">
             {formatCurrency(Balance.total)}
@@ -148,38 +160,49 @@ const FinanceBarChart = () => {
           <Dropdown
             label=""
             dismissOnClick={true}
-            renderTrigger={() => <span>My custom trigger</span>}
-            className="inline-flex items-center rounded-lg pt-5 text-sm font-semibold text-blue-600 uppercase hover:bg-gray-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-blue-500"
+            renderTrigger={() => (
+              <span className="text-blue-600">🗓️ Seleccione periodo</span>
+            )}
           >
-            <DropdownItem>Dashboard</DropdownItem>
-            <DropdownItem>Settings</DropdownItem>
-            <DropdownItem>Earnings</DropdownItem>
-            <DropdownItem>Sign out</DropdownItem>
+            <DropdownItem
+              onClick={() => {
+                setDateRange("WTD");
+              }}
+            >
+              Esta semana
+            </DropdownItem>
+            <DropdownItem
+              onClick={() => {
+                setDateRange("MTD");
+              }}
+            >
+              Este mes
+            </DropdownItem>
+            <DropdownItem
+              onClick={() => {
+                setDateRange("PREV_MONTH");
+              }}
+            >
+              Mes anterior
+            </DropdownItem>
+            <DropdownItem
+              onClick={() => {
+                setDateRange("YTD");
+              }}
+            >
+              Este año
+            </DropdownItem>
+            {/* <DropdownItem
+              onClick={() => {
+                setDateRange("CUSTOM");
+              }}
+            >
+              Seleccionar Rango
+            </DropdownItem> */}
           </Dropdown>
         </div>
 
-        <div className="flex items-center justify-between pt-5">
-          <a
-            href="#"
-            className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold text-blue-600 uppercase hover:bg-gray-100 hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-blue-500"
-          >
-            Revenue Report
-            <svg
-              className="ms-1.5 h-2.5 w-2.5"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 6 10"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 9 4-4-4-4"
-              />
-            </svg>
-          </a>
-        </div>
+        <div className="flex items-center justify-between pt-5"></div>
       </div>
     </div>
   );
