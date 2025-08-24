@@ -10,7 +10,7 @@ import {
   CompanyFinanceProvider,
   useFinanceData,
 } from "./_Context/FinancesProvider";
-import FinanceEntryDataForm from "./components/FinanceEntryData/FinanceEntryDataForm";
+import { CompanyFinanceMovementsTypeProvider } from "./_Context/FinancesMovementsProvider";
 
 export default function FinancesLayout({
   children,
@@ -49,38 +49,39 @@ export default function FinancesLayout({
   return (
     <>
       <CompanyFinanceProvider>
-        <div className="h-[calc(100vh-70px)] p-2 md:flex">
-          <ul className="active flex-column space-y mb-4 space-y-4 text-sm font-medium text-gray-500 md:me-4 md:mb-0 dark:text-gray-400">
-            <button
-              id="toggleSidebar"
-              aria-expanded="true"
-              data-drawer-target="drawer-navigation"
-              data-drawer-show="drawer-navigation"
-              aria-controls="drawer-navigation"
-              className="mr-3 hidden cursor-pointer rounded p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 lg:inline dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              <svg
-                className="h-5 w-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 16 12"
+        <CompanyFinanceMovementsTypeProvider>
+          <div className="h-[calc(100vh-70px)] p-2 md:flex">
+            <ul className="active flex-column space-y mb-4 space-y-4 text-sm font-medium text-gray-500 md:me-4 md:mb-0 dark:text-gray-400">
+              <button
+                id="toggleSidebar"
+                aria-expanded="true"
+                data-drawer-target="drawer-navigation"
+                data-drawer-show="drawer-navigation"
+                aria-controls="drawer-navigation"
+                className="mr-3 hidden cursor-pointer rounded p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 lg:inline dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
-                {" "}
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 1h14M1 6h14M1 11h7"
-                />{" "}
-              </svg>
-            </button>
-            <SideBarFilters />
-            {FinancesAccess.map((access) => {
-              const isActive = pathname === access.hRef;
+                <svg
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 16 12"
+                >
+                  {" "}
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M1 1h14M1 6h14M1 11h7"
+                  />{" "}
+                </svg>
+              </button>
+              <SideBarFilters />
+              {FinancesAccess.map((access) => {
+                const isActive = pathname === access.hRef;
 
-              const linkClasses = `
+                const linkClasses = `
             inline-flex w-full items-center rounded-lg px-4 py-3
             ${
               isActive
@@ -89,30 +90,31 @@ export default function FinancesLayout({
             }
           `;
 
-              return (
-                <li key={access.hRef}>
-                  <Link href={access.hRef} className={linkClasses}>
-                    <svg
-                      className="me-2 size-4 h-4 w-4 text-gray-500 dark:text-gray-400"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      // className="mx-auto size-6"
-                    >
-                      <path d={access.svgPath} />
-                    </svg>
-                    {access.Menu}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="text-medium w-full rounded-lg bg-gray-50 p-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-            {children}
+                return (
+                  <li key={access.hRef}>
+                    <Link href={access.hRef} className={linkClasses}>
+                      <svg
+                        className="me-2 size-4 h-4 w-4 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        // className="mx-auto size-6"
+                      >
+                        <path d={access.svgPath} />
+                      </svg>
+                      {access.Menu}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="text-medium w-full rounded-lg bg-gray-50 p-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+              {children}
+            </div>
           </div>
-        </div>
+        </CompanyFinanceMovementsTypeProvider>
       </CompanyFinanceProvider>
     </>
   );

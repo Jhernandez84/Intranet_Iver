@@ -10,12 +10,17 @@ import { HiCog, HiCurrencyDollar, HiLogout, HiViewGrid } from "react-icons/hi";
 
 import { initFlowbite } from "flowbite";
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 import { useUserAccess } from "../../../context/UserAccessProvider";
 import Link from "next/link";
 
 export default function Apps2Menu() {
+  const pathname = usePathname(); // Hook para obtener ruta actual
+
   const { access, isLoadingAccess } = useUserAccess();
+
+  const userAccessKeys = access?.map((a) => a.key) ?? [];
 
   useEffect(() => {
     console.log("Apps del cliente  ", access, isLoadingAccess);
@@ -26,14 +31,6 @@ export default function Apps2Menu() {
   }, [isLoadingAccess]);
 
   if (isLoadingAccess || !access) return;
-
-  console.log(access);
-
-  <path
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z"
-  />;
 
   const allowedApps = [
     {
@@ -142,34 +139,59 @@ export default function Apps2Menu() {
           </span>
         )}
       >
-        <DropdownHeader className="text-center">Apps</DropdownHeader>
+        <DropdownHeader className="text-center">Aplicaciones</DropdownHeader>
         <DropdownDivider />
+
         <div className="grid grid-cols-3 justify-center p-2">
-          {allowedApps?.map((appsAccess) => {
+          {allowedApps.map((app) => {
+            const isAllowed = userAccessKeys.includes(app.key);
+            const isActive = pathname.startsWith(app.href);
+
             return (
               <DropdownItem
-                key={appsAccess.key}
-                className="group block justify-center rounded-lg p-4 text-center hover:bg-gray-100 dark:hover:bg-gray-600"
+                key={app.key}
+                className={`group block justify-center rounded-lg p-4 text-center ${
+                  isAllowed
+                    ? "hover:bg-gray-100 dark:hover:bg-gray-600"
+                    : "cursor-not-allowed opacity-50"
+                } ${isActive ? "bg-blue-100 dark:bg-blue-700" : ""}`}
+                disabled={!isAllowed}
               >
-                <Link
-                  href={appsAccess.href}
-                  data-dropdown-toggle="apps-dropdown"
-                >
-                  <div className="text-sm font-medium text-gray-900 dark:text-white">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className="mx-auto size-6"
-                      stroke="currentColor"
-                    >
-                      <path d={appsAccess.svgPath} />
-                    </svg>
+                {isAllowed ? (
+                  <Link href={app.href} data-dropdown-toggle="apps-dropdown">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className="mx-auto size-6"
+                        stroke="currentColor"
+                      >
+                        <path d={app.svgPath} />
+                      </svg>
+                    </div>
+                    <div className="pt-1 text-sm font-medium text-gray-900 dark:text-white">
+                      {app.name}
+                    </div>
+                  </Link>
+                ) : (
+                  <div>
+                    <div className="text-sm font-medium text-gray-400 dark:text-gray-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className="mx-auto size-6"
+                        stroke="currentColor"
+                      >
+                        <path d={app.svgPath} />
+                      </svg>
+                    </div>
+                    <div className="pt-1 text-sm font-medium text-gray-400 dark:text-gray-500">
+                      {app.name}
+                    </div>
                   </div>
-                  <div className="pt-1 text-sm font-medium text-gray-900 dark:text-white">
-                    {appsAccess.name}
-                  </div>
-                </Link>
+                )}
               </DropdownItem>
             );
           })}
