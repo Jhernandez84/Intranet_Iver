@@ -39,8 +39,8 @@ export default async function RootLayout({
     error,
   } = await supabase.auth.getUser();
 
-  console.log("🌐 Sesión desde layout:", user);
-  console.log("❌ Error desde layout:", error);
+  // console.log("🌐 Sesión desde layout:", user);
+  // console.log("❌ Error desde layout:", error);
 
   return (
     <UserProvider>

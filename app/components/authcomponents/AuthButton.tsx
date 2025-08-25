@@ -41,7 +41,7 @@ export default function AuthButton() {
     router.refresh(); // Actualiza la página para re-renderizar el Server Component principal
   };
 
-  console.log(user);
+  // console.log(user);
 
   return (
     <>

@@ -23,10 +23,6 @@ const SideBarFilters = () => {
   const [switch1, setSwitch1] = useState(false);
 
   useEffect(() => {
-    console.log("Accessos del cliente ", access, isLoadingAccess);
-  }, [isLoadingAccess, access]);
-
-  useEffect(() => {
     initFlowbite();
   }, [isLoadingAccess]);
 

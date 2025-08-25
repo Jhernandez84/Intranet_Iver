@@ -44,8 +44,6 @@ export default function FinancesLayout({
 
   const financeMovements = useFinanceData();
 
-  console.log(financeMovements);
-
   return (
     <>
       <CompanyFinanceProvider>

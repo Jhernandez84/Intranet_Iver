@@ -40,8 +40,6 @@ export const CompanyBranchesProvider = ({
 }) => {
   const { user, isLoading } = useUser();
 
-  console.log("datos del usuario en Company", user?.company_id);
-
   const [branches, setBranches] = useState<BranchesAccess[] | null>(null);
   const supabase = createClientComponentClient();
 

@@ -15,18 +15,23 @@ interface CardComponentProps {
   label: string;
   period: DateRangeKey;
   actionButton?: ReactNode; // 👈 Aquí pasas el botón u otro elemento
+  actionButton2?: ReactNode; // 👈 Aquí pasas el botón u otro elemento
+  actionButton3?: ReactNode; // 👈 Aquí pasas el botón u otro elemento
 }
 
 export default function CardComponent({
   label,
   period,
   actionButton,
+  actionButton2,
+  actionButton3,
 }: CardComponentProps) {
   useEffect(() => {
     initFlowbite();
   }, []);
 
   const { financeMovements, isLoadingFinanceData } = useFinanceData();
+
   const safeData = financeMovements ?? [];
 
   const { fechaDesde, fechaHasta } = getDateRange(period);
@@ -48,7 +53,11 @@ export default function CardComponent({
             </dd>
           </dl>
           <div>
-            {actionButton && <div>{actionButton}</div>}
+            {actionButton && (
+              <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700">
+                {actionButton}
+              </div>
+            )}
 
             {/* 👉 renderiza el botón */}
             {!actionButton && (

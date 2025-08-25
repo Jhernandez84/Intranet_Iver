@@ -17,6 +17,7 @@ import { useUser } from "../../../../context/UserProvider";
 import { useCompanyBranchesAccess } from "../../../../context/CompanyBranchesProvider";
 import { useFinanceMovementsType } from "../../_Context/FinancesMovementsProvider";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useFinanceData } from "../../_Context/FinancesProvider";
 
 interface FinanceEntryDataFormProps {
   openModal: boolean;
@@ -43,6 +44,7 @@ export default function FinanceEntryDataForm({
   const Branches = useCompanyBranchesAccess();
   const { financeMovementTypes, isLoadingFinanceData } =
     useFinanceMovementsType();
+  const { refreshFinanceMovements } = useFinanceData();
 
   const supabase = createClientComponentClient();
 
@@ -60,6 +62,8 @@ export default function FinanceEntryDataForm({
     sede_id: user?.sede_id ?? null,
   });
 
+  console.log(form.fecha);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -72,9 +76,13 @@ export default function FinanceEntryDataForm({
     console.log("Datos del formulario", form);
   };
 
-  const handleDateChange = (date) => {
-    // ✅ Actualiza el estado cuando el usuario selecciona una nueva fecha
+  const handleDateChange = (date: Date) => {
     setSelectedDate(date);
+
+    setForm((prevForm) => ({
+      ...prevForm,
+      fecha: date,
+    }));
   };
 
   const [saveLoading, setSaveLoading] = useState(false);
@@ -123,6 +131,7 @@ export default function FinanceEntryDataForm({
     }
 
     setSaveLoading(false);
+    await refreshFinanceMovements();
   };
 
   return (
@@ -231,7 +240,7 @@ export default function FinanceEntryDataForm({
                   {financeMovementTypes
                     ?.filter((types) => types.tipo_movimiento === form.tipo)
                     .map((types) => (
-                      <option key={types.id} value={types.id}>
+                      <option key={types.id} value={types.tipo_mov_generico}>
                         {types.tipo_mov_generico}
                       </option>
                     ))}
@@ -343,7 +352,7 @@ export default function FinanceEntryDataForm({
             color="alternative"
             onClick={() => setOpenModal(false)}
           >
-            Cancelar
+            Cerrar
           </Button>
         </ModalFooter>
       </Modal>

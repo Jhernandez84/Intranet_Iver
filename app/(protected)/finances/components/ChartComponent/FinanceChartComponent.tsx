@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 import ApexCharts from "apexcharts";
 import { Dropdown, DropdownItem } from "flowbite-react";
 import { initFlowbite } from "flowbite";
@@ -14,17 +14,36 @@ import {
   type DateRangeKey,
 } from "../../helper/FinanceDataOutputs";
 
-const FinanceBarChart = () => {
+interface CardComponentProps {
+  label: string;
+  period: DateRangeKey;
+  actionButton?: ReactNode; // 👈 Aquí pasas el botón u otro elemento
+  actionButton2?: ReactNode; // 👈 Aquí pasas el botón u otro elemento
+  actionButton3?: ReactNode; // 👈 Aquí pasas el botón u otro elemento
+}
+
+const FinanceBarChart = ({
+  label,
+  period,
+  actionButton,
+  actionButton2,
+  actionButton3,
+}: CardComponentProps) => {
   const chartRef = useRef<ApexCharts | null>(null);
   const chartElRef = useRef<HTMLDivElement | null>(null);
 
   const { financeMovements, isLoadingFinanceData } = useFinanceData();
   const safeData = financeMovements ?? [];
+
   const [dateRange, setDateRange] = useState<DateRangeKey>("WTD");
 
   const { fechaDesde, fechaHasta } = getDateRange(dateRange);
 
-  const { series, categories } = groupByMesTipoForChartPretty(safeData);
+  const { series, categories } = groupByMesTipoForChartPretty(safeData, {
+    fechaDesde: new Date(fechaDesde),
+    fechaHasta: new Date(fechaHasta),
+  });
+
   const Balance = getTotalsByTipo(safeData, { fechaDesde, fechaHasta });
 
   useEffect(() => {
@@ -115,7 +134,7 @@ const FinanceBarChart = () => {
     return () => {
       chartRef.current?.destroy();
     };
-  }, [financeMovements, isLoadingFinanceData]);
+  }, [financeMovements, isLoadingFinanceData, series, categories]);
 
   useEffect(() => {
     initFlowbite();
@@ -133,23 +152,30 @@ const FinanceBarChart = () => {
           </dd>
         </dl>
         <div>
-          <span className="inline-flex items-center rounded-md bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
-            <svg
-              className="me-1.5 h-2.5 w-2.5"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 14"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M5 13V1m0 0L1 5m4-4 4 4"
-              />
-            </svg>
-            Profit rate 23.5%
-          </span>
+          {actionButton && (
+            <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700">
+              {actionButton}
+            </div>
+          )}
+          {!actionButton && (
+            <span className="inline-flex items-center rounded-md bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
+              <svg
+                className="me-1.5 h-2.5 w-2.5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 14"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13V1m0 0L1 5m4-4 4 4"
+                />
+              </svg>
+              Profit rate 23.5%
+            </span>
+          )}
         </div>
       </div>
 

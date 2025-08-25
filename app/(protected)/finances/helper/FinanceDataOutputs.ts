@@ -19,8 +19,8 @@ interface FinanceMovements {
 [];
 
 interface DataFilters {
-  fechaDesde?: string; // ISO string "2025-01-01"
-  fechaHasta?: string; // ISO string "2025-12-31"
+  fechaDesde?: string | Date; // ISO string "2025-01-01"
+  fechaHasta?: string | Date; // ISO string "2025-12-31"
   tipo?: "Ingreso" | "Egreso";
   sede_id?: string;
 }
@@ -46,8 +46,8 @@ function formatDate(date: Date | null) {
 export type DateRangeKey = "WTD" | "MTD" | "PREV_MONTH" | "YTD" | "CUSTOM";
 
 export interface DateRange {
-  fechaDesde: string;
-  fechaHasta: string;
+  fechaDesde: string | Date;
+  fechaHasta: string | Date;
 }
 
 // 👉 función que calcula los rangos
@@ -61,9 +61,8 @@ export function getDateRange(
 
   switch (type) {
     case "WTD": {
-      // Week To Date (desde lunes hasta hoy)
-      const day = today.getDay(); // 0=domingo, 1=lunes...
-      const diff = day === 0 ? 6 : day - 1; // ajustar si es domingo
+      const day = today.getDay(); // 0=domingo
+      const diff = day === 0 ? 6 : day - 1;
       start = new Date(today);
       start.setDate(today.getDate() - diff);
       end = today;
@@ -71,25 +70,22 @@ export function getDateRange(
     }
 
     case "MTD": {
-      // Month To Date
       start = new Date(today.getFullYear(), today.getMonth(), 1);
       end = today;
       break;
     }
 
     case "PREV_MONTH": {
-      // Mes anterior completo
       const prevMonth = today.getMonth() - 1;
       const year =
         prevMonth < 0 ? today.getFullYear() - 1 : today.getFullYear();
       const month = (prevMonth + 12) % 12;
       start = new Date(year, month, 1);
-      end = new Date(year, month + 1, 0); // último día del mes
+      end = new Date(year, month + 1, 0);
       break;
     }
 
     case "YTD": {
-      // Year To Date
       start = new Date(today.getFullYear(), 0, 1);
       end = today;
       break;
@@ -107,9 +103,11 @@ export function getDateRange(
       end = today;
   }
 
-  // Normalizar a ISO string (yyyy-mm-dd)
-  const toISO = (d: Date) => d.toISOString().split("T")[0];
-  return { fechaDesde: toISO(start), fechaHasta: toISO(end) };
+  // Normaliza horas para evitar desfases
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+
+  return { fechaDesde: start, fechaHasta: end };
 }
 
 // Total por tipo de movimiento (ingreso/egreso)
@@ -155,19 +153,33 @@ export function groupByMes(data: FinanceMovements[]) {
   );
 }
 
-export function groupByMesTipoForChartPretty(data: FinanceMovements[]) {
+interface FinanceMovements {
+  fecha: string; // Asegúrate de que sea una fecha ISO o convertible a Date
+  tipo: string; // "ingreso" o "egreso"
+  monto: number;
+}
+
+export function groupByMesTipoForChartPretty(
+  data: FinanceMovements[],
+  dateRange?: { fechaDesde: Date; fechaHasta: Date },
+) {
   const resumen = data.reduce(
     (acc, mov) => {
-      const date = new Date(mov.fecha);
+      const fecha = new Date(mov.fecha); // ← normalizamos aquí
 
-      // Clave para ordenar (YYYY-MM)
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-        2,
-        "0",
-      )}`;
+      if (dateRange) {
+        const { fechaDesde, fechaHasta } = dateRange;
+        if (fecha < fechaDesde || fecha > fechaHasta) {
+          return acc; // ← no lo incluimos
+        }
+      }
+
+      const key = `${fecha.getFullYear()}-${String(
+        fecha.getMonth() + 1,
+      ).padStart(2, "0")}`;
 
       if (!acc[key]) {
-        acc[key] = { ingresos: 0, egresos: 0, total: 0, date };
+        acc[key] = { ingresos: 0, egresos: 0, total: 0, date: fecha };
       }
 
       if (mov.tipo.toLowerCase() === "ingreso") {
@@ -185,10 +197,8 @@ export function groupByMesTipoForChartPretty(data: FinanceMovements[]) {
     >,
   );
 
-  // Ordenar por clave
   const keys = Object.keys(resumen).sort();
 
-  // Formatear mes bonito → Ene 2025, Feb 2025, ...
   const categories = keys.map((k) =>
     resumen[k].date.toLocaleDateString("es-ES", {
       month: "short",

@@ -78,8 +78,6 @@ export const CompanyFinanceMovementsTypeProvider = ({
     getFinanceMovementsTypes();
   }, [user, isLoading, supabase]);
 
-  console.log("Movimientos:", financeMovementTypes);
-
   return (
     <FinanceMovementsContext.Provider
       value={{ financeMovementTypes, isLoadingFinanceData }}

@@ -23,10 +23,6 @@ export default function Apps2Menu() {
   const userAccessKeys = access?.map((a) => a.key) ?? [];
 
   useEffect(() => {
-    console.log("Apps del cliente  ", access, isLoadingAccess);
-  }, [isLoadingAccess, access]);
-
-  useEffect(() => {
     initFlowbite();
   }, [isLoadingAccess]);
 
