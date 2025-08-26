@@ -35,7 +35,7 @@ const FinanceBarChart = ({
   const { financeMovements, isLoadingFinanceData } = useFinanceData();
   const safeData = financeMovements ?? [];
 
-  const [dateRange, setDateRange] = useState<DateRangeKey>("WTD");
+  const [dateRange, setDateRange] = useState<DateRangeKey>("MTD");
 
   const { fechaDesde, fechaHasta } = getDateRange(dateRange);
 

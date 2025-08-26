@@ -34,8 +34,10 @@ import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 export const config = {
   matcher: [
     "/finances/:path*",
-    "/admin/:path*",
+    "/dbadmin/:path*",
+    "/ministries/:path*",
     "/dashboard/:path*",
+    "/leadership/:path*",
     "/coffee/:path*",
     "/secretary/:path*",
     "/forms/:path*",
@@ -44,11 +46,25 @@ export const config = {
   ],
 };
 
+// 👇 prefijos que deben ser SIEMPRE públicos (sin login)
+const PUBLIC_SUBPATHS = [
+  "/forms/liveforms", // incluye /forms/liveforms y cualquier subruta
+  // agrega más si necesitas, p.ej:
+  // "/calendar/public",
+];
+
 export async function middleware(req: NextRequest) {
+  const url = req.nextUrl;
+  const pathname = url.pathname;
+
+  // 0) Deja pasar subrutas públicas sin validar nada
+  if (PUBLIC_SUBPATHS.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
-  const url = req.nextUrl;
   const hasCode = url.searchParams.has("code");
 
   // 1) Sesión

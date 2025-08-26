@@ -31,7 +31,7 @@ export default function Apps2Menu() {
   const allowedApps = [
     {
       name: "Admin DB",
-      href: "/admin",
+      href: "/dbadmin",
       key: "admin",
       keycurrent: true,
       svgPath:

@@ -101,7 +101,7 @@ const Navbar = () => {
                   alt="FlowBite Logo"
                 />
                 <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                  Flowbite
+                  Chr Manager
                 </span>
               </a>
             </div>
@@ -114,28 +114,30 @@ const Navbar = () => {
               >
                 <div className="flex flex-row gap-6 font-medium">
                   <Link
-                    href="/"
+                    href="#home"
                     className="rounded-sm px-3 py-2 text-blue-700 dark:text-blue-500"
                   >
                     Home
                   </Link>
                   <Link
-                    href="/dashboard"
+                    href="#features"
                     className="rounded-sm px-3 py-2 text-blue-700 dark:text-blue-500"
                   >
-                    Dashboard
+                    Características
                   </Link>
+
+                  {/* <Link
+                    href="#pricing"
+                    className="rounded-sm px-3 py-2 text-blue-700 dark:text-blue-500"
+                  >
+                    Pricing
+                  </Link> */}
+
                   <Link
-                    href="/"
+                    href="#contact"
                     className="rounded-sm px-3 py-2 text-blue-700 dark:text-blue-500"
                   >
                     Contacto
-                  </Link>
-                  <Link
-                    href="/"
-                    className="rounded-sm px-3 py-2 text-blue-700 dark:text-blue-500"
-                  >
-                    Perfil
                   </Link>
                 </div>
               </div>

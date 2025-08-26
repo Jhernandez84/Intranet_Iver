@@ -1,8 +1,5 @@
 "use client";
 
-import { DarkThemeToggle } from "flowbite-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import LoginModal from "./components/loginModal/LoginModal";
 import { useEffect } from "react";
 import { initFlowbite } from "flowbite";
 
@@ -11,9 +8,12 @@ export default function Home() {
     initFlowbite();
   }, []);
 
+  const smallSize = { height: 400, width: 300 };
+  const largeSize = { height: 450, width: 320 };
+
   return (
     <>
-      <section className="bg-white py-20">
+      <section id="home" className="scroll-mt-20 bg-white py-20">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-5xl leading-tight font-extrabold text-gray-900">
             Transforma tus datos en decisiones
@@ -32,7 +32,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="features" className="bg-gray-100 py-20">
+      <section
+        id="features"
+        className="min-h-screen scroll-mt-20 bg-gray-100 py-20"
+      >
         <div className="container mx-auto px-6">
           <div className="mb-12 text-center">
             <h2 className="text-4xl font-bold text-gray-900">
@@ -81,7 +84,30 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="contact" className="bg-white py-20">
+      {/* <section id="pricing" className="bg-white py-20">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold text-gray-900">
+            Precios accesibles
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl p-4 text-gray-600">
+            Solicita una demo y conoce todas las herramientas que tenemos para
+            ti
+          </p>
+          <div className="grid grid-cols-3 justify-items-center gap-5">
+            <div className="pt-5">
+              <PricinPage size={smallSize} />
+            </div>
+            <div>
+              <PricinPage size={largeSize} />
+            </div>
+            <div className="pt-5">
+              <PricinPage size={smallSize} />
+            </div>
+          </div>
+        </div>
+      </section> */}
+
+      <section id="contact" className="bg-gray-100 py-20">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-gray-900">
             ¿Listo para empezar?
@@ -101,7 +127,7 @@ export default function Home() {
 
       <footer className="bg-gray-800 py-8 text-white">
         <div className="container mx-auto px-6 text-center text-gray-400">
-          &copy; 2025 DataFlow. Todos los derechos reservados.
+          {/* &copy; 2025 Church Manager. Todos los derechos reservados. */}
         </div>
       </footer>
     </>
