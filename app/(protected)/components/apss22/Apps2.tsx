@@ -20,7 +20,7 @@ export default function Apps2Menu() {
 
   const { access, isLoadingAccess } = useUserAccess();
 
-  const userAccessKeys = access?.map((a) => a.key) ?? [];
+  const userAccessKeys = access?.map((a) => a.path) ?? [];
 
   useEffect(() => {
     initFlowbite();
@@ -140,7 +140,7 @@ export default function Apps2Menu() {
 
         <div className="grid grid-cols-3 justify-center p-2">
           {allowedApps.map((app) => {
-            const isAllowed = userAccessKeys.includes(app.key);
+            const isAllowed = userAccessKeys.includes(app.href);
             const isActive = pathname.startsWith(app.href);
 
             return (
