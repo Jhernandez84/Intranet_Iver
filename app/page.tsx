@@ -84,7 +84,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* <section id="pricing" className="bg-white py-20">
+      {/* <section id="pricing" className="scroll-mt-20  bg-white py-20">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-gray-900">
             Precios accesibles
@@ -107,7 +107,7 @@ export default function Home() {
         </div>
       </section> */}
 
-      <section id="contact" className="bg-gray-100 py-20">
+      <section id="contact" className="scroll-mt-20 bg-gray-100 py-20">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-gray-900">
             ¿Listo para empezar?
