@@ -49,6 +49,7 @@ export const config = {
 // 👇 prefijos que deben ser SIEMPRE públicos (sin login)
 const PUBLIC_SUBPATHS = [
   "/forms/live", // incluye /forms/liveforms y cualquier subruta
+  "/forms/workspace/", // incluye /forms/liveforms y cualquier subruta
   // agrega más si necesitas, p.ej:
   // "/calendar/public",
 ];

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 
 interface FinanceEntryForm {
   rut: string;
@@ -12,12 +13,16 @@ interface FinanceEntryForm {
 }
 
 export default function LiveFormsPage() {
+  const { formid } = useParams<{ formid: string }>(); // <-- aquí tomas el [formid]
+  const search = useSearchParams(); // por si usas ?program=...
+  const program = search.get("program") ?? "";
+
   const [form, setForm] = useState<FinanceEntryForm>({
-    rut: "12345678",
-    name: "Ingreso",
-    last_name: "ingrese apellido paterno",
-    second_last_name: "ingrese apellido materno",
-    phone: "999999999",
+    rut: "",
+    name: "",
+    last_name: "",
+    second_last_name: "",
+    phone: "",
     ivercapacita: "",
   });
 
@@ -30,15 +35,14 @@ export default function LiveFormsPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Solo para ver el estado actualizado en consola:
   useEffect(() => {
-    console.log("Datos del formulario", form);
-  }, [form]);
+    console.log("Form ID:", formid, "Program:", program);
+  }, [formid, program]);
 
   return (
     <div className="align-center inline justify-center overflow-auto p-6">
       <div className="text-center text-lg text-white">
-        <h1>Iver Capacita</h1>
+        <h1>{formid}</h1>
       </div>
 
       <div className="text-md pb-2 text-center text-white">
@@ -191,8 +195,8 @@ export default function LiveFormsPage() {
       </button>
 
       <p>
-        Datos: {form.name} - {form.last_name} - {form.second_last_name} -{" "}
-        {form.phone} - {form.ivercapacita}
+        Datos: {form.rut} - {form.name} - {form.last_name} -{" "}
+        {form.second_last_name} - {form.phone} - {form.ivercapacita}
       </p>
     </div>
   );
