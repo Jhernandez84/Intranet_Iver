@@ -114,13 +114,13 @@ const Navbar = () => {
               >
                 <div className="flex flex-row gap-6 font-medium">
                   <Link
-                    href="#home"
+                    href="/#home"
                     className="rounded-sm px-3 py-2 text-blue-700 dark:text-blue-500"
                   >
                     Home
                   </Link>
                   <Link
-                    href="#features"
+                    href="/#features"
                     className="rounded-sm px-3 py-2 text-blue-700 dark:text-blue-500"
                   >
                     Características
@@ -134,7 +134,7 @@ const Navbar = () => {
                   </Link> */}
 
                   <Link
-                    href="#contact"
+                    href="/#contact"
                     className="rounded-sm px-3 py-2 text-blue-700 dark:text-blue-500"
                   >
                     Contacto

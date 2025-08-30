@@ -2,20 +2,29 @@
 import { initFlowbite } from "flowbite";
 import { useEffect } from "react";
 import Link from "next/link";
-
-import { useUser } from "../../context/UserProvider";
+import { useRouter } from "next/navigation";
 
 export default function FormsPageDashboard() {
+  const router = useRouter();
+
+  const singleFormId = "IverCapacitaFinanzasyEmprendimientos";
+
+  const handleNavigate = (formId: string) => {
+    // ✅ Navega a la ruta dinámicamente usando el router
+    router.push(`/forms/workspace/${formId}`);
+  };
+
+  const handleCreateForm = () => {
+    // ✅ Navega a la ruta dinámicamente usando el router
+    router.push(`/forms/build`);
+  };
+
   useEffect(() => {
     initFlowbite();
   }, []);
 
-  const formId = "IverCapacita";
-
   return (
     <div className="text-medium w-full rounded-lg bg-gray-50 p-4 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-      <h1>Este es el dashboard de formulario</h1>
-
       {/* <section className="bg-gray-50 py-3 sm:py-5 dark:bg-gray-900"> */}
       <div className="w-full px-4">
         <div className="relative overflow-hidden bg-white shadow-md sm:rounded-lg dark:bg-gray-800">
@@ -33,6 +42,7 @@ export default function FormsPageDashboard() {
             <div className="flex flex-shrink-0 flex-col space-y-3 md:flex-row md:items-center md:space-y-0 md:space-x-3 lg:justify-end">
               <button
                 type="button"
+                onClick={handleCreateForm}
                 className="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white focus:ring-4 focus:outline-none"
               >
                 <svg
@@ -48,31 +58,32 @@ export default function FormsPageDashboard() {
                     d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
                   />
                 </svg>
-                Add new product
+                Agregar formulario
               </button>
-              <Link href={`/forms/workspace/${formId}`}>
-                <button
-                  type="button"
-                  className="hover:text-primary-700 flex flex-shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+              <button
+                type="button"
+                onClick={() => {
+                  handleNavigate("IverCapacita");
+                }}
+                className="hover:text-primary-700 flex flex-shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+              >
+                <svg
+                  className="mr-2 h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
                 >
-                  <svg
-                    className="mr-2 h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                    />
-                  </svg>
-                  Workspace
-                </button>
-              </Link>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+                Workspace
+              </button>
               <button
                 type="button"
                 className="hover:text-primary-700 flex flex-shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
@@ -322,7 +333,7 @@ export default function FormsPageDashboard() {
                       </label>
                     </div>
                   </td>
-                  <Link href={`/forms/live/${formId}`}>
+                  <Link href={`/forms/live/${singleFormId}`}>
                     <th
                       scope="row"
                       className="flex items-center px-4 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-white"

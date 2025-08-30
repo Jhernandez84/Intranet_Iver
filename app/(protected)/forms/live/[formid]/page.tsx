@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import MyModal from "../../modals/modals";
+import Link from "next/link";
 
 interface FinanceEntryForm {
   rut: string;
@@ -267,26 +267,35 @@ export default function LiveFormsPage() {
             </select>
           </div> */}
         </div>
-      </form>
 
-      {form.rut &&
-        form.name &&
-        form.last_name &&
-        form.second_last_name &&
-        form.phone && (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-          >
-            Enviar ✅
-          </button>
-        )}
+        {form.rut &&
+          form.name &&
+          form.last_name &&
+          form.second_last_name &&
+          form.phone && (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            >
+              Enviar ✅
+            </button>
+          )}
 
-      {/* <p>
+        {/* <p>
         Datos: {form.rut} - {form.name} - {form.last_name} -{" "}
         {form.second_last_name} - {form.phone} - {form.ivercapacita}
       </p> */}
+
+        <Link href={`/forms/workspace/IverCapacita`}>
+          <button
+            type="button"
+            className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-600"
+          >
+            Regresar ⬅️
+          </button>
+        </Link>
+      </form>
 
       {showModal && (
         <div
