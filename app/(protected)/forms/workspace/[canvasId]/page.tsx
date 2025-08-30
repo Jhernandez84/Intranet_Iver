@@ -16,28 +16,32 @@ const AvailableForms = [
   {
     eventName: "Finanzas y Emprendimientos",
     formId: "IverCapacitaFinanzasyEmprendimientos",
-    description: "descripción",
+    description:
+      "Prosperar no es solo recibir más y más, es saber administrar lo que Dios pone en nuestras manos.",
     attendance: "100",
     imageUrl: "/Gemini_Generated_Image_g4mioxg4mioxg4mi.png",
   },
   {
     eventName: "Inglés",
     formId: "IverCapacitaIngles",
-    description: "descripción",
+    description:
+      "You can make it... Si quieres tomar el desafío de aprender un nuevo idioma, este curso es para ti. ",
     attendance: "50",
     imageUrl: "/Gemini_Generated_Image_dwxhh6dwxhh6dwxh.png",
   },
   {
     eventName: "Reforzamiento",
     formId: "IverCapacitaReforzamiento",
-    description: "descripción",
+    description:
+      "Si alguna asignatura se está haciendo más dificil de lo que esperabas, inscribite en los talleres de reforzamiento, aún hay tiempo para mejorar",
     attendance: "100",
     imageUrl: "/Gemini_Generated_Image_ugfw5lugfw5lugfw.png",
   },
   {
     eventName: "Lenguaje de Señas",
     formId: "IverCapacitaLenguajedeSeñas",
-    description: "descripción",
+    description:
+      "Comunicate más allá de las palabras y aplica el verdadero concepto de inclusión llevando a Jesús a quienes pueden oir de una manera diferente",
     attendance: "40",
     imageUrl: "/Gemini_Generated_Image_9xmvpw9xmvpw9xmv.png",
   },
