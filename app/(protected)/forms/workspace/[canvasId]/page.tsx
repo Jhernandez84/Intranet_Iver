@@ -70,34 +70,36 @@ export default function WorksSpacePage() {
             <>
               <Link
                 key={form.formId}
-                className="transform rounded-lg bg-white shadow-md transition-transform duration-300 ease-in-out hover:scale-105"
+                className="grid h-full min-h-[10rem] transform grid-cols-[40%_60%] rounded-lg border border-gray-200 bg-white shadow-md shadow-sm transition-transform duration-300 ease-in-out hover:scale-104 md:h-[13rem] dark:border-gray-700 dark:bg-gray-800"
                 href={`/forms/live/${form.formId}`}
               >
-                <div className="grid h-[200px] grid-cols-[40%_60%] rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                  <div>
-                    <img
-                      className="h-[100%] rounded-l-lg"
-                      src={form.imageUrl}
-                      alt=""
-                    />
+                {/* className="grid h-full grid-cols-[40%_60%] rounded-lg border border-gray-200 bg-white shadow-sm md:h-[13rem] dark:border-gray-700 dark:bg-gray-800"> */}
+                {/* Imagen */}
+                <img
+                  className="h-full w-full rounded-l-lg object-cover"
+                  src={form.imageUrl}
+                  alt={form.eventName}
+                />
+
+                {/* Contenido */}
+                <div className="grid grid-rows-[15%_70%_15%]">
+                  <div className="flex items-center justify-center">
+                    <p className="text-md mt-2 text-center font-bold tracking-tight text-gray-900 dark:text-white">
+                      {form.eventName}
+                    </p>
                   </div>
-                  <div className="grid grid-rows-[10%_70%_10%]">
-                    <div>
-                      <p className="text-md mb-2 pt-2 text-center font-bold tracking-tight text-gray-900 dark:text-white">
-                        {form.eventName}
-                      </p>
-                    </div>
-                    <div className="p-4 pt-6">
-                      <p className="text-sm text-gray-700 dark:text-gray-400">
-                        {form.description}
-                      </p>
-                    </div>
-                    <div className="pl-4">
-                      <p className="text-sm text-gray-700 dark:text-gray-400">
-                        Cupos totales: {form.attendance}, disponibles:{" "}
-                        {form.attendance}
-                      </p>
-                    </div>
+
+                  {/* Descripción con ellipsis */}
+                  <div className="p-4 pt-6">
+                    <p className="line-clamp-3 overflow-hidden text-sm text-ellipsis text-gray-700 sm:line-clamp-3 md:line-clamp-none dark:text-gray-400">
+                      {form.description}
+                    </p>
+                  </div>
+
+                  <div className="pl-4">
+                    <p className="text-sm text-gray-700 dark:text-gray-400">
+                      Cupos: {form.attendance}, inscritos: {form.attendance}
+                    </p>
                   </div>
                 </div>
               </Link>
