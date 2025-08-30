@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 const AvailableForms = [
   {
@@ -10,40 +11,35 @@ const AvailableForms = [
     description:
       "Estar preparados para actuar ante una situación de emergencia / urgencia, recibiendo herramientas y siendo respaldados por Dios a través de este proyecto",
     attendance: "25",
-    imageUrl:
-      "https://www.elegantthemes.com/blog/wp-content/uploads/2022/03/Canonical-URL-featured-2.jpg",
+    imageUrl: "/Gemini_Generated_Image_7jmyc17jmyc17jmy.png",
   },
   {
     eventName: "Finanzas y Emprendimientos",
     formId: "IverCapacitaFinanzasyEmprendimientos",
     description: "descripción",
     attendance: "100",
-    imageUrl:
-      "https://www.elegantthemes.com/blog/wp-content/uploads/2022/03/Canonical-URL-featured-2.jpg",
+    imageUrl: "/Gemini_Generated_Image_g4mioxg4mioxg4mi.png",
   },
   {
     eventName: "Inglés",
     formId: "IverCapacitaIngles",
     description: "descripción",
     attendance: "50",
-    imageUrl:
-      "https://www.elegantthemes.com/blog/wp-content/uploads/2022/03/Canonical-URL-featured-2.jpg",
+    imageUrl: "/Gemini_Generated_Image_dwxhh6dwxhh6dwxh.png",
   },
   {
     eventName: "Reforzamiento",
     formId: "IverCapacitaReforzamiento",
     description: "descripción",
     attendance: "100",
-    imageUrl:
-      "https://www.elegantthemes.com/blog/wp-content/uploads/2022/03/Canonical-URL-featured-2.jpg",
+    imageUrl: "/Gemini_Generated_Image_ugfw5lugfw5lugfw.png",
   },
   {
     eventName: "Lenguaje de Señas",
     formId: "IverCapacitaLenguajedeSeñas",
     description: "descripción",
     attendance: "40",
-    imageUrl:
-      "https://www.elegantthemes.com/blog/wp-content/uploads/2022/03/Canonical-URL-featured-2.jpg",
+    imageUrl: "/Gemini_Generated_Image_9xmvpw9xmvpw9xmv.png",
   },
 ];
 
@@ -75,10 +71,13 @@ export default function WorksSpacePage() {
               >
                 {/* className="grid h-full grid-cols-[40%_60%] rounded-lg border border-gray-200 bg-white shadow-sm md:h-[13rem] dark:border-gray-700 dark:bg-gray-800"> */}
                 {/* Imagen */}
-                <img
-                  className="h-full w-full rounded-l-lg object-cover"
+                <Image
                   src={form.imageUrl}
                   alt={form.eventName}
+                  width={270} // Puedes ajustar el ancho
+                  height={50} // Y la altura
+                  quality={100} // Opcional, para ajustar la calidad de la imagen
+                  className="h-full w-full rounded-l-lg object-cover"
                 />
 
                 {/* Contenido */}
