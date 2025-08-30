@@ -138,8 +138,8 @@ export default function LiveFormsPage() {
         </p>
       </div>
 
-      <form>
-        <div className="mb-6 grid gap-6">
+      <form className="sm:align-center pr-10 pl-10">
+        <div className="mb-6 grid gap-4">
           <div>
             <label
               htmlFor="rut"
