@@ -3,7 +3,7 @@
 export default function FormsPageDashboard() {
   return (
     <div>
-      <h1>Formularios Eventos</h1>
+      <h1>Tabla de respuestas</h1>
     </div>
   );
 }

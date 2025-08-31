@@ -1,3 +1,3 @@
 export default function DashboardCoffee() {
-  return <p>Coffe Dashboard Page</p>;
+  return <p>Página para creación del formulario</p>;
 }
