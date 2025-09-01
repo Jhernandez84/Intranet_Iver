@@ -12,6 +12,8 @@ interface FinanceEntryForm {
   second_last_name: string;
   phone: string;
   ivercapacita: string;
+  ref_asignatura: string | null;
+  ref_grupo: string | null;
 }
 
 export default function LiveFormsPage() {
@@ -50,6 +52,8 @@ export default function LiveFormsPage() {
     second_last_name: "",
     phone: "",
     ivercapacita: formid,
+    ref_asignatura: null,
+    ref_grupo: null,
   });
 
   const handleChange = (
@@ -80,6 +84,8 @@ export default function LiveFormsPage() {
           second_last_name: form.second_last_name,
           phone: form.phone,
           ivercapacita: formid,
+          ref_asignatura: null,
+          ref_grupo: null,
         },
       ]);
 
@@ -97,6 +103,8 @@ export default function LiveFormsPage() {
         second_last_name: "",
         phone: "",
         ivercapacita: formid,
+        ref_asignatura: null,
+        ref_grupo: null,
       });
 
       return;
@@ -109,6 +117,8 @@ export default function LiveFormsPage() {
         second_last_name: "",
         phone: "",
         ivercapacita: formid,
+        ref_asignatura: null,
+        ref_grupo: null,
       });
     }
 
@@ -241,32 +251,57 @@ export default function LiveFormsPage() {
             />
           </div>
 
-          {/* <div>
+          {formid === "IverCapacitaReforzamiento" ? (
+            <div>
+              <label
+                htmlFor="ref_asignatura"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                ¿Que asignatura necesitas reforzar?
+              </label>
+              <select
+                id="ref_asignatura"
+                name="ref_asignatura"
+                value={form.ref_asignatura}
+                onChange={handleChange}
+                className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                required
+              >
+                <option value="">Seleccione</option>
+                <option value="matematicas">Matemáticas</option>
+                <option value="lenguaje">Lenguaje</option>
+              </select>
+            </div>
+          ) : (
+            []
+          )}
+        </div>
+
+        {formid === "IverCapacitaReforzamiento" && form.ref_asignatura ? (
+          <div>
             <label
-              htmlFor="ivercapacita"
+              htmlFor="ref_grupo"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              ¿En qué IverCapacita quieres participar?
+              ¿En que nivel educacional te encuentras?
             </label>
             <select
-              id="ivercapacita"
-              name="ivercapacita"
-              value={form.ivercapacita}
+              id="ref_grupo"
+              name="ref_grupo"
+              value={form.ref_grupo}
               onChange={handleChange}
               className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               required
             >
               <option value="">Seleccione</option>
-              <option value="Finanzas Personales">Finanzas Personales</option>
-              <option value="Reforzamiento (Escolares)">
-                Reforzamiento (Escolares)
-              </option>
-              <option value="Lenguaje de Señas">Lenguaje de Señas</option>
-              <option value="Inglés">Inglés</option>
-              <option value="Primeros Auxilios">Primeros Auxilios</option>
+              <option value="Basico1">1ro a 4to básico</option>
+              <option value="Basico2">4to a 8vo básico</option>
+              <option value="EMedia">Enseñanza Media</option>
             </select>
-          </div> */}
-        </div>
+          </div>
+        ) : (
+          []
+        )}
 
         {form.rut &&
           form.name &&
