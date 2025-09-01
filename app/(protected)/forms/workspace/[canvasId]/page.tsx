@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import InscritosCount from "../../_Helpers/dbQueries";
 
 const AvailableForms = [
   {
@@ -101,7 +102,8 @@ export default function WorksSpacePage() {
 
                   <div className="pl-4">
                     <p className="text-sm text-gray-700 dark:text-gray-400">
-                      Cupos: {form.attendance}, inscritos: {form.attendance}
+                      Cupos: {form.attendance}, inscritos:{" "}
+                      <InscritosCount formid={form.formId} />
                     </p>
                   </div>
                 </div>

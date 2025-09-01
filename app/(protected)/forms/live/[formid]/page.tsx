@@ -12,8 +12,8 @@ interface FinanceEntryForm {
   second_last_name: string;
   phone: string;
   ivercapacita: string;
-  ref_asignatura: string | null;
-  ref_grupo: string | null;
+  ref_asignatura: string;
+  ref_grupo: string;
 }
 
 export default function LiveFormsPage() {
@@ -52,8 +52,8 @@ export default function LiveFormsPage() {
     second_last_name: "",
     phone: "",
     ivercapacita: formid,
-    ref_asignatura: null,
-    ref_grupo: null,
+    ref_asignatura: "",
+    ref_grupo: "",
   });
 
   const handleChange = (
@@ -63,6 +63,7 @@ export default function LiveFormsPage() {
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    console.log(form);
   };
 
   useEffect(() => {
@@ -84,8 +85,8 @@ export default function LiveFormsPage() {
           second_last_name: form.second_last_name,
           phone: form.phone,
           ivercapacita: formid,
-          ref_asignatura: null,
-          ref_grupo: null,
+          ref_asignatura: form.ref_asignatura,
+          ref_grupo: form.ref_grupo,
         },
       ]);
 
@@ -117,8 +118,8 @@ export default function LiveFormsPage() {
         second_last_name: "",
         phone: "",
         ivercapacita: formid,
-        ref_asignatura: null,
-        ref_grupo: null,
+        ref_asignatura: "",
+        ref_grupo: "",
       });
     }
 
