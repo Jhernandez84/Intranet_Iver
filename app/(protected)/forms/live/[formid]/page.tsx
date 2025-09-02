@@ -305,49 +305,54 @@ export default function LiveFormsPage() {
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="apoderado"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Nombres y Apellidos Apoderado
-            </label>
+          {formid === "IverCapacitaReforzamiento" ||
+            (formid === "IverCapacitaIngles" && (
+              <div>
+                <label
+                  htmlFor="apoderado"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Nombres y Apellidos Apoderado
+                </label>
 
-            <input
-              type="text"
-              id="apoderado"
-              name="apoderado"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Nombres y Apellidos Apoderado"
-              value={form.apoderado}
-              onChange={handleChange}
-              required
-            />
-          </div>
+                <input
+                  type="text"
+                  id="apoderado"
+                  name="apoderado"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  placeholder="Nombres y Apellidos Apoderado"
+                  value={form.apoderado}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            ))}
+          {formid === "IverCapacitaReforzamiento" ||
+            (formid === "IverCapacitaIngles" && (
+              <div>
+                <label
+                  htmlFor="contactoapoderado"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Teléfono contacto apoderado
+                </label>
 
-          <div>
-            <label
-              htmlFor="contactoapoderado"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Teléfono contacto apoderado
-            </label>
+                <input
+                  type="tel"
+                  id="contactoapoderado"
+                  name="contactoapoderado"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  placeholder="999999999"
+                  value={form.contactoapoderado}
+                  onChange={handleChange}
+                  required
 
-            <input
-              type="tel"
-              id="contactoapoderado"
-              name="contactoapoderado"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="999999999"
-              value={form.contactoapoderado}
-              onChange={handleChange}
-              required
+                  // Si quieres validar formato chileno, podrías usar un pattern:
 
-              // Si quieres validar formato chileno, podrías usar un pattern:
-
-              // pattern="^\d{9}$"
-            />
-          </div>
+                  // pattern="^\d{9}$"
+                />
+              </div>
+            ))}
 
           {formid === "IverCapacitaReforzamiento" && (
             <div>
