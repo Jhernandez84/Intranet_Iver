@@ -5,22 +5,50 @@ import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
 
+interface CheckboxOption {
+  label: string;
+  value: string;
+}
+
+const AvailableTargets: CheckboxOption[] = [
+  {
+    label: "Dificultad para comprender los textos",
+    value: "Comprension de Lectura",
+  },
+  {
+    label: "Problemas con la ortografía o redacción",
+    value: "Ortografia y Redaccion",
+  },
+  {
+    label: "Problemas para resolver ejercicios matemáticos",
+    value: "Ejercicios Matematicos",
+  },
+  {
+    label: "Bajo rendimiento académico en general",
+    value: "Rendimiento Academico",
+  },
+  { label: "Falta de hábitos de estudio", value: "Hábitos de estudio" },
+];
+
 interface FinanceEntryForm {
   rut: string;
   name: string;
   last_name: string;
   second_last_name: string;
   phone: string;
+  apoderado: string;
+  contactoapoderado: string;
   ivercapacita: string;
   ref_asignatura: string;
   ref_grupo: string;
+  ref_target: string[]; // ✅ Corrected type: array of strings
 }
 
 export default function LiveFormsPage() {
   const supabase = createClientComponentClient();
 
-  const { formid } = useParams<{ formid: string }>(); // <-- aquí tomas el [formid]
-  const search = useSearchParams(); // por si usas ?program=...
+  const { formid } = useParams<{ formid: string }>();
+  const search = useSearchParams();
   const program = search.get("program") ?? "";
 
   const [showModal, setShowModal] = useState(false);
@@ -31,18 +59,16 @@ export default function LiveFormsPage() {
 
   const handleShowConfirm = () => {
     setShowModal(true);
-
     setTimeout(() => {
       setShowModal(false);
-    }, 5000); // 5000ms = 5 segundos
+    }, 5000);
   };
 
   const handleShowAlert = () => {
     setShowAlert(true);
-
     setTimeout(() => {
       setShowAlert(false);
-    }, 5000); // 5000ms = 5 segundos
+    }, 5000);
   };
 
   const [form, setForm] = useState<FinanceEntryForm>({
@@ -52,8 +78,11 @@ export default function LiveFormsPage() {
     second_last_name: "",
     phone: "",
     ivercapacita: formid,
+    contactoapoderado: "",
+    apoderado: "",
     ref_asignatura: "",
     ref_grupo: "",
+    ref_target: [], // ✅ Initial state with an empty array
   });
 
   const handleChange = (
@@ -63,7 +92,26 @@ export default function LiveFormsPage() {
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    console.log(form);
+  };
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+
+    setForm((prevForm) => {
+      if (checked) {
+        // ✅ Add the value to the ref_target array
+        return {
+          ...prevForm,
+          ref_target: [...prevForm.ref_target, value],
+        };
+      } else {
+        // ✅ Remove the value from the ref_target array
+        return {
+          ...prevForm,
+          ref_target: prevForm.ref_target.filter((item) => item !== value),
+        };
+      }
+    });
   };
 
   useEffect(() => {
@@ -79,14 +127,9 @@ export default function LiveFormsPage() {
       .from("temp_registros")
       .insert([
         {
-          rut: form.rut,
-          name: form.name,
-          last_name: form.last_name,
-          second_last_name: form.second_last_name,
-          phone: form.phone,
-          ivercapacita: formid,
-          ref_asignatura: form.ref_asignatura,
-          ref_grupo: form.ref_grupo,
+          ...form,
+          // Convert array to string for Supabase TEXT column if needed
+          // ref_target: form.ref_target.join(','),
         },
       ]);
 
@@ -103,11 +146,13 @@ export default function LiveFormsPage() {
         last_name: "",
         second_last_name: "",
         phone: "",
+        apoderado: "",
+        contactoapoderado: "",
         ivercapacita: formid,
-        ref_asignatura: null,
-        ref_grupo: null,
+        ref_asignatura: "",
+        ref_grupo: "",
+        ref_target: [], // ✅ Reset the form correctly
       });
-
       return;
     } else {
       console.log("Registro guardado exitosamente");
@@ -117,9 +162,12 @@ export default function LiveFormsPage() {
         last_name: "",
         second_last_name: "",
         phone: "",
+        apoderado: "",
+        contactoapoderado: "",
         ivercapacita: formid,
         ref_asignatura: "",
         ref_grupo: "",
+        ref_target: [],
       });
     }
 
@@ -127,10 +175,17 @@ export default function LiveFormsPage() {
     handleShowConfirm();
   };
 
+  // ... (JSX for the form remains largely the same)
   return (
     <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
       <div className="pb-2 text-center text-lg text-white">
         <h1>{formid}</h1>
+      </div>
+      <div className="text-md pb-2 text-center text-white">
+        <p>
+          Si tienes el deseo de aprender, solo ingresa tus datos y pon atención
+          a las fechas que se informarán
+        </p>
       </div>
 
       {showAlert && (
@@ -142,13 +197,6 @@ export default function LiveFormsPage() {
         </div>
       )}
 
-      <div className="text-md pb-2 text-center text-white">
-        <p>
-          Si tienes el deseo de aprender, solo ingresa tus datos y pon atención
-          a las fechas que se informarán
-        </p>
-      </div>
-
       <form className="sm:align-center pr-10 pl-10">
         <div className="mb-6 grid gap-4">
           <div>
@@ -158,6 +206,7 @@ export default function LiveFormsPage() {
             >
               Rut
             </label>
+
             <input
               type="text"
               id="rut"
@@ -179,6 +228,7 @@ export default function LiveFormsPage() {
             >
               Nombres
             </label>
+
             <input
               type="text"
               id="name"
@@ -199,6 +249,7 @@ export default function LiveFormsPage() {
             >
               Apellido Paterno
             </label>
+
             <input
               type="text"
               id="last_name"
@@ -219,6 +270,7 @@ export default function LiveFormsPage() {
             >
               Apellido Materno
             </label>
+
             <input
               type="text"
               id="second_last_name"
@@ -238,6 +290,7 @@ export default function LiveFormsPage() {
             >
               Teléfono
             </label>
+
             <input
               type="tel"
               id="phone"
@@ -252,13 +305,57 @@ export default function LiveFormsPage() {
             />
           </div>
 
-          {formid === "IverCapacitaReforzamiento" ? (
+          <div>
+            <label
+              htmlFor="apoderado"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Nombres y Apellidos Apoderado
+            </label>
+
+            <input
+              type="text"
+              id="apoderado"
+              name="apoderado"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder="Nombres y Apellidos Apoderado"
+              value={form.second_last_name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="contactoapoderado"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Teléfono contacto apoderado
+            </label>
+
+            <input
+              type="tel"
+              id="contactoapoderado"
+              name="contactoapoderado"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder="999999999"
+              value={form.phone}
+              onChange={handleChange}
+              required
+
+              // Si quieres validar formato chileno, podrías usar un pattern:
+
+              // pattern="^\d{9}$"
+            />
+          </div>
+
+          {formid === "IverCapacitaReforzamiento" && (
             <div>
               <label
                 htmlFor="ref_asignatura"
                 className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
               >
-                ¿Que asignatura necesitas reforzar?
+                ¿Qué asignatura necesitas reforzar?
               </label>
               <select
                 id="ref_asignatura"
@@ -271,10 +368,9 @@ export default function LiveFormsPage() {
                 <option value="">Seleccione</option>
                 <option value="matematicas">Matemáticas</option>
                 <option value="lenguaje">Lenguaje</option>
+                <option value="ambas">Ambas</option>
               </select>
             </div>
-          ) : (
-            []
           )}
         </div>
 
@@ -286,6 +382,7 @@ export default function LiveFormsPage() {
             >
               ¿En que nivel educacional te encuentras?
             </label>
+
             <select
               id="ref_grupo"
               name="ref_grupo"
@@ -295,15 +392,56 @@ export default function LiveFormsPage() {
               required
             >
               <option value="">Seleccione</option>
-              <option value="Basico1">1ro a 4to básico</option>
-              <option value="Basico2">4to a 8vo básico</option>
-              <option value="EMedia">Enseñanza Media</option>
+              <option value="Basico1">1ro básico</option>
+              <option value="Basico1">2do básico</option>
+              <option value="Basico1">3ro básico</option>
+              <option value="Basico1">4to básico</option>
+              <option value="Basico2">5to básico</option>
+              <option value="Basico2">6to básico</option>
+              <option value="Basico2">7mo básico</option>
+              <option value="Basico2">8vo básico</option>
+              <option value="EMedia">1ro Media</option>
+              <option value="EMedia">2do Media</option>
+              <option value="EMedia">3ro Media</option>
+              <option value="EMedia">4to Media</option>
             </select>
           </div>
         ) : (
           []
         )}
+        {/* ✅ New Checkbox Group for ref_target */}
+        {formid === "IverCapacitaReforzamiento" &&
+          form.ref_asignatura &&
+          form.ref_grupo && (
+            <div className="mb-6">
+              <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                ¿Qué tipo de dificultad presenta el estudiante en esas áreas?
+              </label>
+              <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                {AvailableTargets.map((option) => (
+                  <div key={option.value} className="flex items-center">
+                    <input
+                      id={option.value}
+                      type="checkbox"
+                      name="ref_target"
+                      value={option.value}
+                      checked={form.ref_target.includes(option.value)}
+                      onChange={handleCheckboxChange}
+                      className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
+                    />
+                    <label
+                      htmlFor={option.value}
+                      className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    >
+                      {option.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
+        {/* ... (Buttons) ... */}
         {form.rut &&
           form.name &&
           form.last_name &&
@@ -317,11 +455,6 @@ export default function LiveFormsPage() {
               Enviar ✅
             </button>
           )}
-
-        {/* <p>
-        Datos: {form.rut} - {form.name} - {form.last_name} -{" "}
-        {form.second_last_name} - {form.phone} - {form.ivercapacita}
-      </p> */}
 
         <Link href={`/forms/workspace/IverCapacita`}>
           <button
@@ -350,11 +483,12 @@ export default function LiveFormsPage() {
             >
               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
             </svg>
+
             <span className="sr-only">Felicidades</span>
           </div>
 
           <div className="ms-3 text-sm font-medium">
-            ¡Ya has quedado inscrito para {form.ivercapacita} !!
+            Felicidades!! has quedado inscrito para {form.ivercapacita} !!
           </div>
 
           <button
