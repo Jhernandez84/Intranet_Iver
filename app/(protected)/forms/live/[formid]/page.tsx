@@ -319,7 +319,7 @@ export default function LiveFormsPage() {
               name="apoderado"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               placeholder="Nombres y Apellidos Apoderado"
-              value={form.second_last_name}
+              value={form.apoderado}
               onChange={handleChange}
               required
             />
@@ -339,7 +339,7 @@ export default function LiveFormsPage() {
               name="contactoapoderado"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               placeholder="999999999"
-              value={form.phone}
+              value={form.contactoapoderado}
               onChange={handleChange}
               required
 
