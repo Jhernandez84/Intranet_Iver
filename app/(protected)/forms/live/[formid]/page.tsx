@@ -305,54 +305,52 @@ export default function LiveFormsPage() {
             />
           </div>
 
-          {formid === "IverCapacitaReforzamiento" ||
-            (formid === "IverCapacitaIngles" && (
-              <div>
-                <label
-                  htmlFor="apoderado"
-                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Nombres y Apellidos Apoderado
-                </label>
+          {(formid === "IverCapacitaReforzamiento" ||
+            formid === "IverCapacitaIngles") && (
+            <div>
+              <label
+                htmlFor="apoderado"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Nombres y Apellidos Apoderado
+              </label>
 
-                <input
-                  type="text"
-                  id="apoderado"
-                  name="apoderado"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                  placeholder="Nombres y Apellidos Apoderado"
-                  value={form.apoderado}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            ))}
-          {formid === "IverCapacitaReforzamiento" ||
-            (formid === "IverCapacitaIngles" && (
-              <div>
-                <label
-                  htmlFor="contactoapoderado"
-                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Teléfono contacto apoderado
-                </label>
+              <input
+                type="text"
+                id="apoderado"
+                name="apoderado"
+                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                placeholder="Nombres y Apellidos Apoderado"
+                value={form.apoderado}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          )}
+          {(formid === "IverCapacitaReforzamiento" ||
+            formid === "IverCapacitaIngles") && (
+            <div>
+              <label
+                htmlFor="contactoapoderado"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Teléfono contacto apoderado
+              </label>
 
-                <input
-                  type="tel"
-                  id="contactoapoderado"
-                  name="contactoapoderado"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                  placeholder="999999999"
-                  value={form.contactoapoderado}
-                  onChange={handleChange}
-                  required
-
-                  // Si quieres validar formato chileno, podrías usar un pattern:
-
-                  // pattern="^\d{9}$"
-                />
-              </div>
-            ))}
+              <input
+                type="tel"
+                id="contactoapoderado"
+                name="contactoapoderado"
+                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                placeholder="999999999"
+                value={form.contactoapoderado}
+                onChange={handleChange}
+                required
+                pattern="^\d{9}$"
+                // Si quieres validar formato chileno, podrías usar un pattern:
+              />
+            </div>
+          )}
 
           {formid === "IverCapacitaReforzamiento" && (
             <div>
@@ -377,6 +375,35 @@ export default function LiveFormsPage() {
               </select>
             </div>
           )}
+
+          {formid === "IverCapacitaIngles" && (
+            <div>
+              <label
+                htmlFor="ref_asignatura"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                ¿Cómo evalua su nivel de inglés?
+              </label>
+              <select
+                id="ref_asignatura"
+                name="ref_asignatura"
+                value={form.ref_asignatura}
+                onChange={handleChange}
+                className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                required
+              >
+                <option value="">Seleccione</option>
+                <option value="Beginner">No se nada de Inglés</option>
+                <option value="Basic">Tengo un Inglés muy básico</option>
+                <option value="Elementary">
+                  Puedo llevar una conversación simple. Necesito mejorar
+                </option>
+                <option value="Pre-Intermediate">
+                  Puedo tener una conversación con tiempos verbales más compleja
+                </option>
+              </select>
+            </div>
+          )}
         </div>
 
         {formid === "IverCapacitaReforzamiento" && form.ref_asignatura ? (
@@ -398,17 +425,17 @@ export default function LiveFormsPage() {
             >
               <option value="">Seleccione</option>
               <option value="Basico1">1ro básico</option>
-              <option value="Basico1">2do básico</option>
-              <option value="Basico1">3ro básico</option>
-              <option value="Basico1">4to básico</option>
-              <option value="Basico2">5to básico</option>
-              <option value="Basico2">6to básico</option>
-              <option value="Basico2">7mo básico</option>
-              <option value="Basico2">8vo básico</option>
-              <option value="EMedia">1ro Media</option>
-              <option value="EMedia">2do Media</option>
-              <option value="EMedia">3ro Media</option>
-              <option value="EMedia">4to Media</option>
+              <option value="Basico2">2do básico</option>
+              <option value="Basico3">3ro básico</option>
+              <option value="Basico4">4to básico</option>
+              <option value="Basico5">5to básico</option>
+              <option value="Basico6">6to básico</option>
+              <option value="Basico7">7mo básico</option>
+              <option value="Basico8">8vo básico</option>
+              <option value="EMedia1">1ro Medio</option>
+              <option value="EMedia2">2do Medio</option>
+              <option value="EMedia3">3ro Medio</option>
+              <option value="EMedia4">4to Medio</option>
             </select>
           </div>
         ) : (
