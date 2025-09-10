@@ -32,7 +32,13 @@ export default function DashboardPage() {
 
   return (
     <>
-      {open && <FinanceEntryDataForm openModal={open} setOpenModal={setOpen} />}
+      {open && (
+        <FinanceEntryDataForm
+          editView={false}
+          openModal={open}
+          setOpenModal={setOpen}
+        />
+      )}
 
       <div className="grid h-[calc(100vh-70px)] grid-rows-[60%_40%] gap-2">
         {/* Primera fila (60%) */}

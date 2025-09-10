@@ -45,7 +45,13 @@ export default function DashboardFinance() {
 
   return (
     <>
-      {open && <FinanceEntryDataForm openModal={open} setOpenModal={setOpen} />}
+      {open && (
+        <FinanceEntryDataForm
+          editView={false}
+          openModal={open}
+          setOpenModal={setOpen}
+        />
+      )}
       <div className="grid h-[calc(100vh-70px)] grid-rows-[22%_78%] gap-2">
         <div>
           <div className="grid h-full w-full grid-cols-2 gap-2">

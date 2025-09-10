@@ -13,6 +13,16 @@ const AvailableForms = [
       "Estar preparados para actuar ante una situación de emergencia / urgencia, recibiendo herramientas y siendo respaldados por Dios a través de este proyecto",
     attendance: "25",
     imageUrl: "/Gemini_Generated_Image_7jmyc17jmyc17jmy.png",
+    eventSessions: "4 sesiones",
+    eventType: "Clase Grupal",
+    eventAttendance: "100% presencial",
+    eventTime: "90 Minutos",
+    eventDates: [
+      { Date: "27-Sept" },
+      { Date: "04-Oct" },
+      { Date: "11-Oct" },
+      { Date: "25-Oct" },
+    ],
   },
   {
     eventName: "Finanzas y Emprendimientos",
@@ -21,14 +31,26 @@ const AvailableForms = [
       "Prosperar no es solo recibir más y más, es saber administrar lo que Dios pone en nuestras manos.",
     attendance: "100",
     imageUrl: "/Gemini_Generated_Image_g4mioxg4mioxg4mi.png",
+    eventSessions: "3 sesiones",
+    eventType: "Seminario",
+    eventAttendance: "100% presencial",
+    eventTime: "5 horas",
+    eventDates: [{ Date: "01-Nov" }, { Date: "08-Nov" }, { Date: "15-Nov" }],
   },
   {
     eventName: "Inglés",
     formId: "IverCapacitaIngles",
     description:
       "You can make it... Si quieres tomar el desafío de aprender un nuevo idioma, este curso es para ti. ",
-    attendance: "50",
+    attendance: "70",
     imageUrl: "/Gemini_Generated_Image_dwxhh6dwxhh6dwxh.png",
+    eventSessions: "3 Meses",
+    eventType: "Intensivo",
+    eventAttendance: "Híbrido (Online y Presencial)",
+    eventTime: "1 hora cada día",
+    eventDates: [
+      { Date: "Miércoles y Viernes desde el 1ro de Oct (+ 2 Sábados al mes)" },
+    ],
   },
   {
     eventName: "Reforzamiento",
@@ -37,14 +59,24 @@ const AvailableForms = [
       "Si alguna asignatura se está haciendo más dificil de lo que esperabas, inscribite en los talleres de reforzamiento, aún hay tiempo para mejorar",
     attendance: "100",
     imageUrl: "/Gemini_Generated_Image_ugfw5lugfw5lugfw.png",
+    eventSessions: "2 Meses",
+    eventType: "Clases Grupales",
+    eventAttendance: "100% presencial",
+    eventTime: "1 hora 30 minutos",
+    eventDates: [{ Date: "Todos los viernes desde el 4 Oct" }],
   },
   {
     eventName: "Lenguaje de Señas",
     formId: "IverCapacitaLenguajedeSeñas",
     description:
       "Comunicate más allá de las palabras y aplica el verdadero concepto de inclusión llevando a Jesús a quienes pueden oir de una manera diferente",
-    attendance: "40",
+    attendance: "30",
     imageUrl: "/Gemini_Generated_Image_9xmvpw9xmvpw9xmv.png",
+    eventSessions: "2 Meses",
+    eventType: "Clases Grupales",
+    eventAttendance: "100% presencial",
+    eventTime: "90 Minutos",
+    eventDates: [{ Date: "Todos los miércoles desde el 24-Sept" }],
   },
 ];
 
@@ -53,7 +85,6 @@ export default function WorksSpacePage() {
 
   const { formid } = useParams<{ formid: string }>();
   const id = String(formid ?? "");
-
   return (
     <div className="align-center inline justify-center overflow-auto p-6">
       <div className="text-center text-lg text-white">
@@ -80,13 +111,13 @@ export default function WorksSpacePage() {
                   src={form.imageUrl}
                   alt={form.eventName}
                   width={270} // Puedes ajustar el ancho
-                  height={50} // Y la altura
+                  height={100} // Y la altura
                   quality={100} // Opcional, para ajustar la calidad de la imagen
                   className="h-full w-full rounded-l-lg object-cover"
                 />
 
                 {/* Contenido */}
-                <div className="grid grid-rows-[15%_70%_15%]">
+                <div className="grid grid-rows-[10%_50%_25%_10%]">
                   <div className="flex items-center justify-center">
                     <p className="text-md mt-2 text-center font-bold tracking-tight text-gray-900 dark:text-white">
                       {form.eventName}
@@ -95,13 +126,22 @@ export default function WorksSpacePage() {
 
                   {/* Descripción con ellipsis */}
                   <div className="p-4 pt-6">
-                    <p className="line-clamp-3 overflow-hidden text-sm text-ellipsis text-gray-700 sm:line-clamp-3 md:line-clamp-none dark:text-gray-400">
+                    <p className="line-clamp-3 overflow-hidden text-xs text-ellipsis text-gray-700 sm:line-clamp-3 md:line-clamp-none dark:text-gray-400">
                       {form.description}
                     </p>
                   </div>
+                  {/* Fechas tentativas */}
+                  <div className="pl-4">
+                    <div className="pl-4 text-xs">
+                      {form.eventType} - {form.eventSessions} - {form.eventTime}
+                    </div>
+                    <div className="pl-4 text-xs">
+                      {form.eventDates.map((fechas) => fechas.Date).join(" ")}
+                    </div>
+                  </div>
 
                   <div className="pl-4">
-                    <p className="text-sm text-gray-700 dark:text-gray-400">
+                    <p className="text-xs text-gray-700 dark:text-gray-400">
                       Cupos: {form.attendance}, inscritos:{" "}
                       <InscritosCount formid={form.formId} />
                     </p>

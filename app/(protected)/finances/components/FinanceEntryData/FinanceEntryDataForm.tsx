@@ -20,6 +20,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useFinanceData } from "../../_Context/FinancesProvider";
 
 interface FinanceEntryDataFormProps {
+  editView: boolean;
   openModal: boolean;
   setOpenModal: (value: boolean) => void;
 }
@@ -37,6 +38,7 @@ interface FinanceEntryForm {
 }
 
 export default function FinanceEntryDataForm({
+  editView,
   openModal,
   setOpenModal,
 }: FinanceEntryDataFormProps) {
@@ -143,7 +145,11 @@ export default function FinanceEntryDataForm({
         className="z-50"
       >
         <ModalHeader className="flex items-center">
-          <p className="pl-5 text-center">Ingreso de nuevo registro</p>
+          {editView ? (
+            <p className="pl-5 text-center">Edición de registro</p>
+          ) : (
+            <p className="pl-5 text-center">Ingreso de nuevo registro</p>
+          )}
         </ModalHeader>
         <ModalBody className="grid grid-cols-2 gap-6">
           {/* Left side, datepicker */}
@@ -272,7 +278,7 @@ export default function FinanceEntryDataForm({
             <div className="group z-0 mt-2 grid w-full text-white">
               <div className="group z-0 grid w-full text-white">
                 <label
-                  htmlFor="visitors"
+                  htmlFor="monto"
                   className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Monto
@@ -292,7 +298,7 @@ export default function FinanceEntryDataForm({
             <div className="group z-0 mt-2 grid w-full text-white">
               <div className="group z-0 grid w-full text-white">
                 <label
-                  htmlFor="countries"
+                  htmlFor="metodo_pago"
                   className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Medio de pago
@@ -334,7 +340,7 @@ export default function FinanceEntryDataForm({
         <ModalFooter className="flex justify-end">
           <Button
             disabled={saveLoading}
-            className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-500"
+            className="cursor-pointer rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-500"
             onClick={handleSubmit}
           >
             {saveLoading ? (
@@ -348,7 +354,7 @@ export default function FinanceEntryDataForm({
           </Button>
 
           <Button
-            className="cursor-pointer"
+            className="cursor-pointer hover:bg-gray-900"
             color="alternative"
             onClick={() => setOpenModal(false)}
           >

@@ -1,10 +1,13 @@
 "use client";
 import { initFlowbite } from "flowbite";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import CreateNewForm from "./_Components/newFormModal";
 
 export default function FormsPageDashboard() {
+  const [openModalNewForm, setOpenModalNewForm] = useState(false);
+
   const router = useRouter();
 
   const singleFormId = "IverCapacitaFinanzasyEmprendimientos";
@@ -48,8 +51,9 @@ export default function FormsPageDashboard() {
   };
 
   const handleCreateForm = () => {
+    setOpenModalNewForm(true);
     // ✅ Navega a la ruta dinámicamente usando el router
-    router.push(`/forms/build`);
+    // router.push(`/forms/build`);
   };
 
   const handleEditForm = (formid: string) => {
@@ -69,6 +73,12 @@ export default function FormsPageDashboard() {
   return (
     <div className="text-medium w-full rounded-lg bg-gray-50 p-4 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
       {/* <section className="bg-gray-50 py-3 sm:py-5 dark:bg-gray-900"> */}
+      {openModalNewForm && (
+        <CreateNewForm
+          openModal={openModalNewForm}
+          setOpenModal={setOpenModalNewForm}
+        />
+      )}
       <div className="w-full px-4">
         <div className="relative overflow-hidden bg-white shadow-md sm:rounded-lg dark:bg-gray-800">
           <div className="flex flex-col space-y-3 px-4 py-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
