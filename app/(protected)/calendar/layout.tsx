@@ -4,13 +4,15 @@
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Datepicker } from "flowbite-react";
-import CalendarMonthView from "./_Components/CalendarGridComponent";
+import { useCalendarView } from "./_Context/CalendarContext";
 
 export default function CalendarLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { view, setView } = useCalendarView();
+
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const pathname = usePathname();
@@ -21,68 +23,67 @@ export default function CalendarLayout({
 
   return (
     <>
-      <div className="h-[calc(100vh-70px)] p-2 md:flex">
-        <ul className="flex-column space-y mb-4 space-y-6 text-sm font-medium text-gray-500 md:me-4 md:mb-0 dark:text-gray-400">
-          <Datepicker
-            name="fecha"
-            inline
-            weekStart={1}
-            showTodayButton={false}
-            showClearButton={false}
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
-
-          <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-8 dark:border-gray-700 dark:bg-gray-800">
-            <div className="mb-4 flex items-center justify-between">
-              <h5 className="text-xl leading-none font-bold text-gray-900 dark:text-white">
-                Latest Customers
-              </h5>
-              <a
-                href="#"
-                className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
-              >
-                View all
-              </a>
-            </div>
-            <div className="flow-root">
-              {/* renderizar la lista eventos próximos */}
-              {/* renderizar la lista eventos próximos */}
-
-              <ul
-                role="list"
-                className="divide-y divide-gray-200 dark:divide-gray-700"
-              >
-                <li className="py-3 sm:py-4">
-                  <div className="flex items-center">
-                    <div className="shrink-0">
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src="/docs/images/people/profile-picture-1.jpg"
-                        alt="Neil image"
-                      />
-                    </div>
-                    <div className="ms-4 min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                        Neil Sims
-                      </p>
-                      <p className="truncate text-sm text-gray-500 dark:text-gray-400">
-                        email@windster.com
-                      </p>
-                    </div>
-                    <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                      $320
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
+      <div className="grid h-[calc(100vh-70px)] grid-rows-[70px_1fr] p-2">
+        <div className="inline-flex h-[50px] w-full rounded bg-[#1F2937] dark:bg-gray-800">
+          <div className="inline-flex rounded-md p-2 shadow-xs" role="group">
+            <p>Navegación Fecha</p>
           </div>
-        </ul>
-
-        <div className="text-medium w-full rounded-lg bg-gray-50 p-6 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-          {children}
+          <div className="inline-flex rounded-md p-2 shadow-xs" role="group">
+            <button
+              type="button"
+              onClick={() => setView("Daily")}
+              className={`cursor-pointer rounded-s-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 ${view === "Daily" ? "text-blue-400" : "text-gray-900"}`}
+            >
+              Día
+            </button>
+            <button
+              onClick={() => setView("Week")}
+              type="button"
+              className="cursor-pointer border-t border-b border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
+            >
+              Semana
+            </button>
+            <button
+              onClick={() => setView("Month")}
+              type="button"
+              className="cursor-pointer border border-b border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
+            >
+              Mes
+            </button>
+            <button
+              onClick={() => setView("Year")}
+              type="button"
+              className="cursor-pointer rounded-e-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:focus:text-white dark:focus:ring-blue-500"
+            >
+              Año
+            </button>
+          </div>
+          <div className="inline-flex rounded-md p-2 shadow-xs" role="group">
+            <button
+              type="button"
+              onClick={() => alert("Nuevo Evento")}
+              className="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mr-2 hidden cursor-pointer items-center justify-center rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:ring-4 focus:outline-none sm:inline-flex"
+            >
+              <svg
+                aria-hidden="true"
+                className="mr-1 -ml-1 h-5 w-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>{" "}
+              Agregar Evento
+            </button>
+          </div>
         </div>
+        <section className="h-full overflow-auto rounded bg-gray-800 p-2 text-white">
+          {children}
+        </section>
       </div>
     </>
   );

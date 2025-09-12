@@ -10,6 +10,7 @@ import { UserProvider } from "./context/UserProvider";
 import { CompanyProvider } from "./context/CompanyProvider";
 import { CompanyBranchesProvider } from "./context/CompanyBranchesProvider";
 import { UserAccessProvider } from "./context/UserAccessProvider";
+import { CalendarViewProvider } from "./(protected)/calendar/_Context/CalendarContext";
 
 import "./globals.css";
 
@@ -47,26 +48,28 @@ export default async function RootLayout({
       <CompanyProvider>
         <UserAccessProvider>
           <CompanyBranchesProvider>
-            <html lang="es" suppressHydrationWarning>
-              <head>
-                <ThemeModeScript />
-              </head>
-              <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-              >
-                {/* Navbar fijo en la primera fila */}
-                <div className="sticky top-0 z-50 h-[var(--navbar-h)]">
-                  <Navbar />
-                </div>
+            <CalendarViewProvider>
+              <html lang="es" suppressHydrationWarning>
+                <head>
+                  <ThemeModeScript />
+                </head>
+                <body
+                  className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+                >
+                  {/* Navbar fijo en la primera fila */}
+                  <div className="sticky top-0 z-50 h-[var(--navbar-h)]">
+                    <Navbar />
+                  </div>
 
-                {/* Contenido con scroll propio */}
-                <main className="h-[calc(100vh-70px)] w-full bg-gray-500 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-                  {/* Si tienes Sidebar/AppsMenu dentro del contenido, envuélvelos aquí */}
-                  {/* <Sidebar /> / <AppsMenu /> si aplica */}
-                  <div>{children}</div>
-                </main>
-              </body>
-            </html>
+                  {/* Contenido con scroll propio */}
+                  <main className="h-[calc(100vh-70px)] w-full bg-gray-500 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                    {/* Si tienes Sidebar/AppsMenu dentro del contenido, envuélvelos aquí */}
+                    {/* <Sidebar /> / <AppsMenu /> si aplica */}
+                    <div>{children}</div>
+                  </main>
+                </body>
+              </html>
+            </CalendarViewProvider>
           </CompanyBranchesProvider>
         </UserAccessProvider>
       </CompanyProvider>

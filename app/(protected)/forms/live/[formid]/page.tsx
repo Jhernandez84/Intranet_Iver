@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
@@ -47,6 +48,8 @@ interface FinanceEntryForm {
 export default function LiveFormsPage() {
   const supabase = createClientComponentClient();
 
+  const router = useRouter();
+
   const { formid } = useParams<{ formid: string }>();
   const search = useSearchParams();
   const program = search.get("program") ?? "";
@@ -59,9 +62,11 @@ export default function LiveFormsPage() {
 
   const handleShowConfirm = () => {
     setShowModal(true);
+
     setTimeout(() => {
       setShowModal(false);
-    }, 5000);
+      router.push(`/forms/workspace/IverCapacita`);
+    }, 2000);
   };
 
   const handleShowAlert = () => {
