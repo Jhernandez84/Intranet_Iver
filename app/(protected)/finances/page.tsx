@@ -8,6 +8,33 @@ import FinanceBarChart from "./components/ChartComponent/FinanceChartComponent";
 import { useFinanceData } from "./_Context/FinancesProvider";
 import FinanceEntryDataForm from "./components/FinanceEntryData/FinanceEntryDataForm";
 
+interface FinanceEntryForm {
+  // Unificamos fecha como string "YYYY-MM-DD" para ser 100% compatible con el provider y los inputs
+  fecha: string;
+  tipo: string;
+  tipo_mov: string;
+  metodo_pago: string;
+  monto: string; // string para input number; casteamos al guardar
+  num_doc: string;
+  observaciones: string;
+  estado: string;
+  sede_id?: string | null;
+}
+
+const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+const baseRecordForm: FinanceEntryForm = {
+  fecha: todayStr,
+  tipo: "Ingreso",
+  tipo_mov: "",
+  metodo_pago: "Efectivo",
+  monto: "0",
+  num_doc: "",
+  observaciones: "",
+  estado: "Ingresado",
+  sede_id: null,
+};
+
 export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const { refreshFinanceMovements } = useFinanceData();
@@ -34,7 +61,9 @@ export default function DashboardPage() {
     <>
       {open && (
         <FinanceEntryDataForm
+          initialValues={baseRecordForm} // ✅ pasa un objeto válido
           editView={false}
+          movementId="" // ✅ requerido por las props
           openModal={open}
           setOpenModal={setOpen}
         />

@@ -3,6 +3,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import SideBarCoffeeMenu from "./_Components/SideBarCoffeeMenu";
 
 export default function CoffeeLayout({
   children,
@@ -54,7 +55,8 @@ export default function CoffeeLayout({
 
   return (
     <>
-      <div className="h-[91.7vh] p-2 md:flex">
+      {/* <SideBarCoffeeMenu /> */}
+      <div className="h-[calc(100vh-70px)] p-2 md:flex">
         <ul className="active flex-column space-y mb-4 space-y-4 text-sm font-medium text-gray-500 md:me-4 md:mb-0 dark:text-gray-400">
           {CoffeeAccess.map((access) => {
             const isActive = pathname === access.hRef;
@@ -88,7 +90,7 @@ export default function CoffeeLayout({
             );
           })}
         </ul>
-        <div className="text-medium w-full rounded-lg bg-gray-50 p-6 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+        <div className="text-medium w-full rounded-lg bg-gray-50 p-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
           {children}
         </div>
       </div>

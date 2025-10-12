@@ -1,27 +1,110 @@
 import { Dropdown, DropdownItem, DropdownDivider } from "flowbite-react";
-import { useState } from "react";
-import { formatTableData } from "../../helper/FinanceDataTableFills";
+import { useState, useMemo } from "react";
 import { useFinanceData } from "../../_Context/FinancesProvider";
 import FinanceEntryDataForm from "../FinanceEntryData/FinanceEntryDataForm";
+import { formatCurrency } from "../../helper/FinanceDataOutputs";
 
-interface MovementsTableProps {
+function DetailsModal({
+  movement,
+  openModal,
+  setOpenModal,
+}: {
+  movement: string | null;
   openModal: boolean;
-  setOpenModal: (value: boolean) => void;
+  setOpenModal: (v: boolean) => void;
+}) {
+  if (!openModal) return null;
+  const title = "Observaciones";
+  const details = movement ?? "";
+
+  return (
+    <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-transparent p-4">
+      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-900">
+        <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+          {title}
+        </h3>
+        <p className="text-gray-700 dark:text-gray-300">{details}</p>
+        <button
+          onClick={() => setOpenModal(false)}
+          className="mt-6 w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition duration-150 hover:bg-blue-700"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  );
 }
 
+interface FinanceEntryForm {
+  fecha: string; // "YYYY-MM-DD"
+  tipo: string;
+  tipo_mov: string;
+  metodo_pago: string;
+  monto: string; // string para inputs; parseas al guardar
+  num_doc: string;
+  observaciones: string;
+  estado: string;
+  sede_id?: string | null;
+  // NOTA: el form no necesita sede_nombre
+}
+
+type FinanceMovement = {
+  id: string;
+  fecha: string; // viene como string desde el provider
+  tipo: string;
+  tipo_mov: string;
+  metodo_pago: string;
+  monto: number | string;
+  num_doc: string | null;
+  observaciones: string | null;
+  estado: string;
+  sede_id?: string | null;
+  sede_nombre: string | null;
+};
+
+const toForm = (m: FinanceMovement): FinanceEntryForm => ({
+  fecha: m.fecha ?? new Date().toISOString().slice(0, 10),
+  tipo: m.tipo ?? "Ingreso",
+  tipo_mov: m.tipo_mov ?? "",
+  metodo_pago: m.metodo_pago ?? "Efectivo",
+  monto: String(m.monto ?? "0"),
+  num_doc: m.num_doc ?? "",
+  observaciones: m.observaciones ?? "",
+  estado: m.estado ?? "Ingresado",
+  sede_id: m.sede_id ?? null,
+});
+
 export default function MovementsTable() {
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [modDetails, setMovDetails] = useState<string | null>(null);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editView, setEditView] = useState(false);
 
-  const handleEditForm = () => {
-    setEditView(true);
-    setModalOpen(true);
-  };
+  // Movement seleccionado (para tener el id a mano)
+  const [recordDetails, setRecordDetails] = useState<FinanceMovement | null>(
+    null,
+  );
 
-  const handleViewDetails = () => {
-    setEditView(false);
-    setModalOpen(true);
-  };
+  // Valores iniciales del FORM (shape del form, no del movement)
+  const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const baseRecordForm: FinanceEntryForm = useMemo(
+    () => ({
+      fecha: todayStr,
+      tipo: "Ingreso",
+      tipo_mov: "",
+      metodo_pago: "Efectivo",
+      monto: "0",
+      num_doc: "",
+      observaciones: "",
+      estado: "Ingresado",
+      sede_id: null,
+    }),
+    [todayStr],
+  );
+
+  const [initialFormValues, setInitialFormValues] =
+    useState<FinanceEntryForm>(baseRecordForm);
 
   const selectedKeys = [
     "fecha",
@@ -30,24 +113,55 @@ export default function MovementsTable() {
     "monto",
     "metodo_pago",
     "num_doc",
-    // "observaciones",
+    "sede_nombre",
   ] as const;
-  const { financeMovements, isLoadingFinanceData } = useFinanceData();
 
-  const { headers, rows } = formatTableData(financeMovements, selectedKeys);
+  const { financeMovements } = useFinanceData();
+
+  const handleEditForm = (movement: FinanceMovement) => {
+    setRecordDetails(movement); // para usar su id en el modal
+    setInitialFormValues(toForm(movement)); // adaptamos al shape del form
+    setEditView(true);
+    setModalOpen(true);
+  };
+
+  const handleViewDetails = (obs: string | null) => {
+    setMovDetails(obs ?? "");
+    setShowDetailModal(true);
+  };
 
   return (
     <div className="relative rounded shadow-md sm:rounded-lg">
       <FinanceEntryDataForm
+        // el form ahora recibe el shape correcto
+        initialValues={initialFormValues}
         editView={editView}
+        movementId={recordDetails?.id ?? ""} // pasamos el id si existe
         openModal={modalOpen}
-        setOpenModal={setModalOpen}
+        setOpenModal={(v) => {
+          setModalOpen(v);
+          if (!v) {
+            // limpiar al cerrar
+            setRecordDetails(null);
+            setEditView(false);
+            setInitialFormValues(baseRecordForm);
+          }
+        }}
       />
+
+      {showDetailModal && (
+        <DetailsModal
+          movement={modDetails}
+          openModal={showDetailModal}
+          setOpenModal={setShowDetailModal}
+        />
+      )}
+
       <div className="h-[calc(100vh-350px)] overflow-y-auto">
         <table className="w-full table-fixed text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
           <thead className="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-900 dark:text-gray-400">
             <tr>
-              {headers.map((header) => (
+              {selectedKeys.map((header) => (
                 <th
                   key={header}
                   className="sticky top-0 z-10 w-1/4 bg-gray-50 px-6 py-3 dark:bg-gray-900"
@@ -61,51 +175,38 @@ export default function MovementsTable() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, idx) => (
+            {(financeMovements ?? []).map((movement: FinanceMovement) => (
               <tr
-                key={idx}
+                key={movement.id}
                 className="border-b border-gray-200 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
               >
-                {row.map((cell, i) => (
-                  <td className="px-6 py-4" key={i}>
-                    {cell}
-                  </td>
-                ))}
-                <td className="grid cursor-pointer grid-cols-3 gap-2 px-6 py-4 hover:text-white">
-                  <div>
-                    <svg
-                      onClick={() => handleViewDetails()}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      className="size-6 cursor-pointer text-white hover:text-blue-500"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <svg
-                      onClick={() => handleEditForm()}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      className="size-6 cursor-pointer text-white hover:text-yellow-400"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                      />
-                    </svg>
-                  </div>
+                <td className="truncate px-6 py-4">{movement.fecha || ""}</td>
+                <td className="truncate px-6 py-4">{movement.tipo}</td>
+                <td className="truncate px-6 py-4">{movement.tipo_mov}</td>
+                <td className="truncate px-6 py-4 font-semibold">
+                  {formatCurrency(Number(movement.monto))}
+                </td>
+                <td className="truncate px-6 py-4">{movement.metodo_pago}</td>
+                <td className="truncate px-6 py-4">{movement.num_doc}</td>
+                <td className="truncate px-6 py-4">{movement.sede_nombre}</td>
+
+                <td className="grid grid-cols-2 gap-3 px-4">
+                  <button
+                    className="cursor-pointer truncate py-4 text-lg"
+                    onClick={() => handleViewDetails(movement.observaciones)}
+                    title="Ver observaciones"
+                    aria-label="Ver observaciones"
+                  >
+                    ℹ️
+                  </button>
+                  <button
+                    className="cursor-pointer truncate py-4 text-lg"
+                    onClick={() => handleEditForm(movement)}
+                    title="Editar movimiento"
+                    aria-label="Editar movimiento"
+                  >
+                    📝
+                  </button>
                 </td>
               </tr>
             ))}

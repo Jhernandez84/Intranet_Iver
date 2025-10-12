@@ -6,6 +6,33 @@ import MovementsTable from "../components/MovementsTable/MovementsTable";
 import FinanceEntryDataForm from "../components/FinanceEntryData/FinanceEntryDataForm";
 import { useFinanceData } from "../_Context/FinancesProvider";
 
+interface FinanceEntryForm {
+  // Unificamos fecha como string "YYYY-MM-DD" para ser 100% compatible con el provider y los inputs
+  fecha: string;
+  tipo: string;
+  tipo_mov: string;
+  metodo_pago: string;
+  monto: string; // string para input number; casteamos al guardar
+  num_doc: string;
+  observaciones: string;
+  estado: string;
+  sede_id?: string | null;
+}
+
+const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+const baseRecordForm: FinanceEntryForm = {
+  fecha: todayStr,
+  tipo: "Ingreso",
+  tipo_mov: "",
+  metodo_pago: "Efectivo",
+  monto: "0",
+  num_doc: "",
+  observaciones: "",
+  estado: "Ingresado",
+  sede_id: null,
+};
+
 export default function DashboardFinance() {
   const [open, setOpen] = useState(false);
   const { refreshFinanceMovements } = useFinanceData();
@@ -45,13 +72,13 @@ export default function DashboardFinance() {
 
   return (
     <>
-      {open && (
-        <FinanceEntryDataForm
-          editView={false}
-          openModal={open}
-          setOpenModal={setOpen}
-        />
-      )}
+      <FinanceEntryDataForm
+        initialValues={baseRecordForm} // ✅ pasa un objeto válido
+        editView={false}
+        movementId="" // ✅ requerido por las props
+        openModal={open}
+        setOpenModal={setOpen}
+      />
       <div className="grid h-[calc(100vh-70px)] grid-rows-[22%_78%] gap-2">
         <div>
           <div className="grid h-full w-full grid-cols-2 gap-2">

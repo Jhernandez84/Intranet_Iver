@@ -24,6 +24,7 @@ interface FinanceMovements {
   monto: number;
   estado: string;
   sede_id: string;
+  sede_nombre: string;
 }
 
 interface FinanceAccessContextType {
@@ -65,38 +66,46 @@ export const CompanyFinanceProvider = ({
 
   const supabase = createClientComponentClient();
 
-  const getFinanceMovements = async () => {
+  const getFinanceMovements = async (filters: {
+    fromDate?: string | null;
+    toDate?: string | null;
+    tipo?: string | null;
+    tipoMov?: string | null;
+    metodoPago?: string | null;
+  }) => {
     if (isLoading || !user) return;
     setIsLoadingFinanceData(true);
 
-    let query = supabase
-      .from("finanzas")
-      .select(
-        "id, company_id, responsable_id, fecha, tipo, tipo_mov, metodo_pago, observaciones, mov_grupo, num_doc, monto, estado, sede_id",
-      )
-      .eq("company_id", user.company_id);
+    const { data, error } = await supabase.rpc("finanzas_buscar", {
+      p_company_id: user.company_id,
+      p_sede_id: user.sede_id ?? null,
+      p_fecha_desde: filters.fromDate ?? null,
+      p_fecha_hasta: filters.toDate ?? null,
+      p_tipo: filters.tipo ?? null,
+      p_tipo_mov: filters.tipoMov ?? null,
+      p_metodo_pago: filters.metodoPago ?? null,
+    });
 
-    if (user?.sede_id) {
-      query = query.eq("sede_id", user.sede_id);
-    }
-
-    query = query.order("created_at", { ascending: false });
-
-    const { data: financeData, error } = await query;
     if (error) {
       console.error("Error loading finance data:", error.message);
     }
 
-    setFinanceMovements(financeData ?? []);
+    setFinanceMovements(data ?? []);
     setIsLoadingFinanceData(false);
   };
 
   useEffect(() => {
-    getFinanceMovements();
+    getFinanceMovements({
+      fromDate: "2025-09-01", // 👈 defaults
+      toDate: new Date().toISOString().split("T")[0],
+    });
   }, [user, isLoading, supabase]);
 
   const refreshFinanceMovements = async () => {
-    await getFinanceMovements();
+    await getFinanceMovements({
+      fromDate: "2025-01-01", // 👈 defaults
+      toDate: new Date().toISOString().split("T")[0],
+    });
   };
 
   return (
