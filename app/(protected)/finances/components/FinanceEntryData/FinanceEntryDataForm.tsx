@@ -433,8 +433,7 @@ export default function FinanceEntryDataForm({
           </Button>
 
           <Button
-            className="cursor-pointer hover:bg-gray-900"
-            color="alternative"
+            className="cursor-pointer rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-500"
             onClick={() => setOpenModal(false)}
           >
             Cerrar

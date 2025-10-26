@@ -42,7 +42,7 @@ export default function CardComponent({
 
   return (
     <>
-      <div className="w-full rounded-lg bg-white shadow-sm md:p-6 dark:bg-gray-900">
+      <div className="h-[200px] w-full rounded-lg bg-white shadow-sm md:p-6 dark:bg-gray-900">
         <div className="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
           <dl>
             <dt className="pb-1 text-base font-normal text-gray-500 dark:text-gray-400">

@@ -10,7 +10,7 @@ export default function FormsPageDashboard() {
 
   const router = useRouter();
 
-  const singleFormId = "IverCapacitaFinanzasyEmprendimientos";
+  const singleFormId = "SeminarioMatrimonios2025";
 
   const formsData = [
     {
@@ -47,7 +47,7 @@ export default function FormsPageDashboard() {
 
   const handleNavigate = (formId: string) => {
     // ✅ Navega a la ruta dinámicamente usando el router
-    router.push(`/forms/workspace/${formId}`);
+    router.push(`/forms/live3/${formId}`);
   };
 
   const handleCreateForm = () => {
@@ -388,7 +388,7 @@ export default function FormsPageDashboard() {
                           </label>
                         </div>
                       </td>
-                      <Link href={`/forms/live/${singleFormId}`}>
+                      <Link href={`/forms/live3/${singleFormId}`}>
                         <th
                           scope="row"
                           className="flex items-center px-4 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-white"

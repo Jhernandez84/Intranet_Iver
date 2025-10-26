@@ -69,7 +69,7 @@ export default function DashboardPage() {
         />
       )}
 
-      <div className="grid h-[calc(100vh-70px)] grid-rows-[60%_40%] gap-2">
+      <div className="grid grid-rows-[60%_40%] gap-2">
         {/* Primera fila (60%) */}
         <div className="grid h-full grid-cols-[60%_40%] gap-2">
           {/* Gráfico a la izquierda */}

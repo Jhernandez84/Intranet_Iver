@@ -24,6 +24,7 @@ interface FinanceMovements {
 interface FinanceMovementsContextType {
   financeMovementTypes: FinanceMovements[] | null;
   isLoadingFinanceData: boolean;
+  refreshFinanceMovements: () => Promise<void>; // ← agregar función
 }
 
 // 👇 aquí ya no es un array, es un objeto
@@ -35,7 +36,11 @@ export const useFinanceMovementsType = () => {
   const context = useContext(FinanceMovementsContext);
   if (context === null) {
     console.log("Access to financeMovementTypes is null");
-    return { financeMovementTypes: null, isLoadingFinanceData: false };
+    return {
+      financeMovementTypes: null,
+      isLoadingFinanceData: false,
+      refreshFinanceMovements: async () => {},
+    };
   }
   return context;
 };
@@ -54,33 +59,41 @@ export const CompanyFinanceMovementsTypeProvider = ({
 
   const supabase = createClientComponentClient();
 
+  const getFinanceMovementsTypes = async () => {
+    if (isLoading || !user) return;
+    setIsLoadingFinanceData(true);
+
+    const query = supabase
+      .from("tipos_movimiento")
+      .select(
+        "id, descripcion, company_id, activo, tipo_mov_contable, tipo_mov_generico, tipo_movimiento, tipo_mov_clase",
+      )
+      .eq("company_id", user.company_id);
+
+    const { data: financeData, error } = await query;
+    if (error) {
+      console.error("Error loading finance data:", error.message);
+    }
+
+    setFinanceMovementTypes(financeData ?? []);
+    setIsLoadingFinanceData(false);
+  };
+
   useEffect(() => {
-    const getFinanceMovementsTypes = async () => {
-      if (isLoading || !user) return;
-      setIsLoadingFinanceData(true);
-
-      const query = supabase
-        .from("tipos_movimiento")
-        .select(
-          "id, descripcion, company_id, activo, tipo_mov_contable, tipo_mov_generico, tipo_movimiento, tipo_mov_clase",
-        )
-        .eq("company_id", user.company_id);
-
-      const { data: financeData, error } = await query;
-      if (error) {
-        console.error("Error loading finance data:", error.message);
-      }
-
-      setFinanceMovementTypes(financeData ?? []);
-      setIsLoadingFinanceData(false);
-    };
-
     getFinanceMovementsTypes();
   }, [user, isLoading, supabase]);
 
+  const refreshFinanceMovements = async () => {
+    await getFinanceMovementsTypes();
+  };
+
   return (
     <FinanceMovementsContext.Provider
-      value={{ financeMovementTypes, isLoadingFinanceData }}
+      value={{
+        financeMovementTypes,
+        isLoadingFinanceData,
+        refreshFinanceMovements,
+      }}
     >
       {children}
     </FinanceMovementsContext.Provider>

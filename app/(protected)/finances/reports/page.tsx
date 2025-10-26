@@ -79,7 +79,7 @@ export default function DashboardFinance() {
         openModal={open}
         setOpenModal={setOpen}
       />
-      <div className="grid h-[calc(100vh-70px)] grid-rows-[22%_78%] gap-2">
+      <div className="grid h-full grid-rows-[200px_1fr] gap-4">
         <div>
           <div className="grid h-full w-full grid-cols-2 gap-2">
             {/* <div className="h-full w-full"> */}
