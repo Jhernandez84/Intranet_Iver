@@ -150,7 +150,7 @@ export default function LiveFormsPage2() {
     <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
       <div className="pb-5 text-center text-2xl font-bold text-white">
         {/* <h1>{formid}</h1> */}
-        <p>Levántate y Resplandece - Aviva, 2025 Octubre 31</p>
+        <p>Levántate y Resplandece - Aviva, 2025 Noviembre 22</p>
       </div>
       <div className="pb-3 text-center text-sm text-white">
         <Image
