@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import Image from "next/image";
 import Link from "next/link";
 
 interface CheckboxOption {
@@ -12,10 +13,12 @@ interface CheckboxOption {
 }
 
 interface FinanceEntryForm {
+  rut: string;
   name: string;
   last_name: string;
   phone: string;
   ivercapacita: string;
+  fec_nac: string;
   ref_grupo: string;
 }
 
@@ -51,10 +54,12 @@ export default function LiveFormsPage2() {
   };
 
   const [form, setForm] = useState<FinanceEntryForm>({
+    rut: "",
     name: "",
     last_name: "",
     phone: "",
     ivercapacita: formid,
+    fec_nac: "",
     ref_grupo: "",
   });
 
@@ -114,9 +119,11 @@ export default function LiveFormsPage2() {
       setSaveError(insertError.message);
       handleShowAlert();
       setForm({
+        rut: "",
         name: "",
         last_name: "",
         phone: "",
+        fec_nac: "",
         ivercapacita: formid,
         ref_grupo: "",
       });
@@ -124,9 +131,11 @@ export default function LiveFormsPage2() {
     } else {
       console.log("Registro guardado exitosamente");
       setForm({
+        rut: "",
         name: "",
         last_name: "",
         phone: "",
+        fec_nac: "",
         ivercapacita: formid,
         ref_grupo: "",
       });
@@ -141,30 +150,53 @@ export default function LiveFormsPage2() {
     <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
       <div className="pb-5 text-center text-2xl font-bold text-white">
         {/* <h1>{formid}</h1> */}
-        <p>Fiesta de la luz - IverKids, 2025 Octubre 31</p>
+        <p>Levántate y Resplandece - Aviva, 2025 Octubre 31</p>
       </div>
       <div className="pb-3 text-center text-sm text-white">
-        <p>
-          Atención niñ@s!!! Este viernes 31 de Octubre, desde las 19:00 horas
-          tendremos una nueva oportunidad para celebrar la fiesta de la luz,
-          invita a tus amigos para que conozcan a Jesús y recuerda que es sin
-          disfraz!
-        </p>
+        <Image
+          src="/ImagenAviva.jpeg"
+          alt="Levántate y Resplandece - Aviva"
+          width={270}
+          height={100}
+          quality={100}
+          className="h-full w-full rounded-l-lg object-cover"
+        />
+        <p></p>
       </div>
       <div className="text-md pb-4 text-center text-white">
-        <p>Ingresa tus datos si quieres participar</p>
+        <p>Ingrese sus datos para finalizar su inscripción</p>
       </div>
       {showAlert && (
         <div
           className="mb-4 rounded-lg bg-red-50 p-4 text-center text-sm text-red-800 dark:bg-gray-800 dark:text-red-400"
           role="alert"
         >
-          Usted ya está inscrito para participar en un IverCapacita
+          Usted ya está inscrito para participar en Aviva
         </div>
       )}
 
       <form className="sm:align-center pr-10 pl-10">
         <div className="mb-6 grid gap-4">
+          <div>
+            <label
+              htmlFor="rut"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Rut
+            </label>
+
+            <input
+              type="number"
+              id="rut"
+              name="rut"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder="12345678"
+              value={form.rut}
+              onChange={handleChange}
+              required
+              autoComplete="given-name"
+            />
+          </div>
           <div>
             <label
               htmlFor="name"
@@ -178,7 +210,7 @@ export default function LiveFormsPage2() {
               id="name"
               name="name"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="John"
+              placeholder="Nombres"
               value={form.name}
               onChange={handleChange}
               required
@@ -199,7 +231,7 @@ export default function LiveFormsPage2() {
               id="last_name"
               name="last_name"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Apellido Paterno"
+              placeholder="Apellidos"
               value={form.last_name}
               onChange={handleChange}
               required
@@ -211,16 +243,37 @@ export default function LiveFormsPage2() {
               htmlFor="phone"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Edad
+              Número de contacto
             </label>
 
             <input
-              type="number"
+              type="phone"
               id="phone"
               name="phone"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder=""
+              placeholder="9123456789"
               value={form.phone}
+              onChange={handleChange}
+              required
+              // Si quieres validar formato chileno, podrías usar un pattern:
+              // pattern="^\d{9}$"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="fec_nac"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Fecha de nacimiento
+            </label>
+
+            <input
+              type="date"
+              id="fec_nac"
+              name="fec_nac"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder=""
+              value={form.fec_nac}
               onChange={handleChange}
               required
               // Si quieres validar formato chileno, podrías usar un pattern:
@@ -233,7 +286,7 @@ export default function LiveFormsPage2() {
               htmlFor="ref_grupo"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              ¿Participa en IverKids?
+              Eres parte de la casa Iver?
             </label>
             <select
               id="ref_grupo"
@@ -251,15 +304,20 @@ export default function LiveFormsPage2() {
         </div>
 
         {/* ... (Buttons) ... */}
-        {form.name && form.last_name && form.phone && form.ref_grupo && (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-          >
-            Enviar ✅
-          </button>
-        )}
+        {form.rut &&
+          form.name &&
+          form.last_name &&
+          form.phone &&
+          form.fec_nac &&
+          form.ref_grupo && (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            >
+              Enviar ✅
+            </button>
+          )}
 
         {/* <Link href={`/forms/workspace/IverCapacita`}>
           <button
