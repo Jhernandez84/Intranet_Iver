@@ -6,6 +6,8 @@ import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
 import Link from "next/link";
+// 1. Importar SweetAlert2
+import Swal from "sweetalert2";
 
 interface CheckboxOption {
   label: string;
@@ -31,27 +33,51 @@ export default function LiveFormsPage2() {
   const search = useSearchParams();
   const program = search.get("program") ?? "";
 
-  const [showModal, setShowModal] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  // 2. Eliminar showModal ya que SweetAlert2 lo reemplazará
+  // const [showModal, setShowModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); // Mantener este para el error dentro del formulario si lo prefieres
 
   const [sendind, setIsSending] = useState(false);
   const [insertError, setSaveError] = useState<string | null>(null);
 
+  // 3. Función reemplazada para mostrar SweetAlert2 de éxito
   const handleShowConfirm = () => {
-    setShowModal(true);
+    Swal.fire({
+      icon: "success",
+      title: "¡Felicidades!",
+      text: `Ha quedado inscrit@ para ${form.ivercapacita}!!`,
+      showConfirmButton: false,
+      timer: 3000,
+    });
 
-    setTimeout(() => {
-      setShowModal(false);
-      // router.push(`/forms/workspace/IverCapacita`);
-    }, 2000);
+    // Si quieres redirigir después de la alerta, usa la promesa de Swal
+    // Swal.fire({...}).then(() => {
+    //   router.push(`/forms/workspace/IverCapacita`);
+    // });
   };
 
-  const handleShowAlert = () => {
-    setShowAlert(true);
-    setTimeout(() => {
-      setShowAlert(false);
-    }, 5000);
+  // Función para mostrar SweetAlert2 de error
+  const handleShowErrorAlert = (message: string) => {
+    Swal.fire({
+      icon: "error",
+      title: "Error de Inscripción",
+      text: message,
+      confirmButtonText: "Entendido",
+    });
+    // Opcionalmente, puedes mantener la alerta interna si quieres:
+    // setShowAlert(true);
+    // setTimeout(() => {
+    //   setShowAlert(false);
+    // }, 5000);
   };
+
+  // Eliminamos la función original handleShowAlert si solo se usaba para el error.
+  // const handleShowAlert = () => {
+  //   setShowAlert(true);
+  //   setTimeout(() => {
+  //     setShowAlert(false);
+  //   }, 5000);
+  // };
 
   const [form, setForm] = useState<FinanceEntryForm>({
     rut: "",
@@ -72,26 +98,6 @@ export default function LiveFormsPage2() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { value, checked } = event.target;
-
-  //   setForm((prevForm) => {
-  //     if (checked) {
-  //       // ✅ Add the value to the ref_target array
-  //       return {
-  //         ...prevForm,
-  //         ref_target: [...prevForm.ref_target, value],
-  //       };
-  //     } else {
-  //       // ✅ Remove the value from the ref_target array
-  //       return {
-  //         ...prevForm,
-  //         ref_target: prevForm.ref_target.filter((item) => item !== value),
-  //       };
-  //     }
-  //   });
-  // };
-
   useEffect(() => {
     console.log("Form ID:", formid, "Program:", program);
   }, [formid, program]);
@@ -106,8 +112,6 @@ export default function LiveFormsPage2() {
       .insert([
         {
           ...form,
-          // Convert array to string for Supabase TEXT column if needed
-          // ref_target: form.ref_target.join(','),
         },
       ]);
 
@@ -117,7 +121,12 @@ export default function LiveFormsPage2() {
         insertError.message,
       );
       setSaveError(insertError.message);
-      handleShowAlert();
+
+      // 4. Usar SweetAlert2 para el error
+      handleShowErrorAlert(
+        "Usted ya está inscrito o hubo un error: " + insertError.message,
+      );
+
       setForm({
         rut: "",
         name: "",
@@ -127,9 +136,11 @@ export default function LiveFormsPage2() {
         ivercapacita: formid,
         ref_grupo: "",
       });
+      setIsSending(false); // Mover aquí para que el botón se habilite si falla
       return;
     } else {
       console.log("Registro guardado exitosamente");
+      // Limpiar formulario y mostrar SweetAlert de éxito
       setForm({
         rut: "",
         name: "",
@@ -139,10 +150,10 @@ export default function LiveFormsPage2() {
         ivercapacita: formid,
         ref_grupo: "",
       });
+      handleShowConfirm();
     }
 
     setIsSending(false);
-    handleShowConfirm();
   };
 
   // ... (JSX for the form remains largely the same)
@@ -157,15 +168,33 @@ export default function LiveFormsPage2() {
           src="/ImagenAviva.jpeg"
           alt="Levántate y Resplandece - Aviva"
           width={270}
-          height={100}
+          height={0}
           quality={100}
-          className="h-full w-full rounded-l-lg object-cover"
+          className="m-2 mx-auto block rounded-lg object-cover"
         />
-        <p></p>
+        <p className="m-2 text-lg font-bold">
+          Le recordamos que el valor de inscripción es de $5.000 e incluye el
+          almuerzo
+        </p>
+        <hr />
+        <p className="mt-2 font-bold">
+          Si desea pagar con transferencia, puede hacerlo a la siguiente cuenta:
+        </p>
+        <p>Nombre: Jacqueline Espinoza </p>
+        <p>Rut: 14342646-7</p>
+        <p>Banco: BCI</p>
+        <p>Cuenta: Cuenta vista</p>
+        <p className="mb-2">Número de cuenta: 41500130</p>
+        <hr />
+        <p className="m-2 font-bold italic">
+          * Pagos en efectivo directamente en Iver el día del evento
+        </p>
+        <hr />
       </div>
-      <div className="text-md pb-4 text-center text-white">
+      <div className="pb-4 text-center text-lg font-bold text-white">
         <p>Ingrese sus datos para finalizar su inscripción</p>
       </div>
+      {/* 5. Dejar este mensaje de error solo si quieres la alerta interna además de SweetAlert2 */}
       {showAlert && (
         <div
           className="mb-4 rounded-lg bg-red-50 p-4 text-center text-sm text-red-800 dark:bg-gray-800 dark:text-red-400"
@@ -313,71 +342,16 @@ export default function LiveFormsPage2() {
             <button
               type="button"
               onClick={handleSubmit}
-              className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+              disabled={sendind} // Deshabilitar mientras se envía
+              className={`me-2 mb-2 w-full cursor-pointer rounded-lg px-5 py-2.5 text-sm font-medium text-white ${sendind ? "bg-gray-500" : "bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"}`}
             >
-              Enviar ✅
+              {sendind ? "Enviando..." : "Enviar ✅"}
             </button>
           )}
-
-        {/* <Link href={`/forms/workspace/IverCapacita`}>
-          <button
-            type="button"
-            className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-600"
-          >
-            Regresar ⬅️
-          </button>
-        </Link> */}
       </form>
 
-      {showModal && (
-        <div
-          id="toast-success"
-          className="fixed top-4 right-4 z-50 mb-4 flex w-full max-w-xs items-center rounded-lg bg-white p-4 text-gray-700 shadow-lg dark:bg-gray-800 dark:text-gray-200"
-          role="status"
-          aria-live="polite"
-        >
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200">
-            <svg
-              className="h-5 w-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-            </svg>
-
-            <span className="sr-only">Felicidades</span>
-          </div>
-
-          <div className="ms-3 text-sm font-medium">
-            Felicidades!! has quedado inscrito para {form.ivercapacita} !!
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowModal(false)}
-            className="-mx-1.5 -my-1.5 ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 focus:ring-2 focus:ring-gray-300 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white"
-            aria-label="Cerrar"
-          >
-            <svg
-              className="h-3 w-3"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 14 14"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
+      {/* 6. Eliminar el JSX del toast-success anterior */}
+      {/* {showModal && (...) } */}
     </div>
   );
 }
