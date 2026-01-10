@@ -6,6 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
 import Link from "next/link";
+import Swal from "sweetalert2";
 
 interface FinanceEntryForm {
   rut: string;
@@ -37,12 +38,18 @@ export default function LiveFormsPage() {
   const [insertError, setSaveError] = useState<string | null>(null);
 
   const handleShowConfirm = () => {
-    setShowModal(true);
+    Swal.fire({
+      title: "Muchas gracias por inscribirse",
+      text: "Pronto le contactarán para una breve entrevista",
+      icon: "success",
+    });
 
-    setTimeout(() => {
-      setShowModal(false);
-      // router.push(`/forms/workspace/PostulaIverKids`);
-    }, 2000);
+    // setShowModal(true);
+
+    // setTimeout(() => {
+    //   setShowModal(false);
+    //   // router.push(`/forms/workspace/PostulaIverKids`);
+    // }, 2000);
   };
 
   const handleShowAlert = () => {
@@ -179,16 +186,6 @@ export default function LiveFormsPage() {
           datos del formulario
         </p>
       </div>
-
-      {showAlert && (
-        <div
-          className="mb-4 rounded-lg bg-red-50 p-4 text-center text-sm text-red-800 dark:bg-gray-800 dark:text-red-400"
-          role="alert"
-        >
-          Usted ya está inscrit@!
-        </div>
-      )}
-
       <form className="sm:align-center pr-10 pl-10">
         <div className="mb-6 grid gap-4">
           <div>
