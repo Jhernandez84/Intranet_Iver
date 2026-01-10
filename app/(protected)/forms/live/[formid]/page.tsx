@@ -4,32 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import Image from "next/image";
 import Link from "next/link";
-
-interface CheckboxOption {
-  label: string;
-  value: string;
-}
-
-const AvailableTargets: CheckboxOption[] = [
-  {
-    label: "Dificultad para comprender los textos",
-    value: "Comprension de Lectura",
-  },
-  {
-    label: "Problemas con la ortografía o redacción",
-    value: "Ortografia y Redaccion",
-  },
-  {
-    label: "Problemas para resolver ejercicios matemáticos",
-    value: "Ejercicios Matematicos",
-  },
-  {
-    label: "Bajo rendimiento académico en general",
-    value: "Rendimiento Academico",
-  },
-  { label: "Falta de hábitos de estudio", value: "Hábitos de estudio" },
-];
 
 interface FinanceEntryForm {
   rut: string;
@@ -65,7 +41,7 @@ export default function LiveFormsPage() {
 
     setTimeout(() => {
       setShowModal(false);
-      router.push(`/forms/workspace/IverCapacita`);
+      // router.push(`/forms/workspace/PostulaIverKids`);
     }, 2000);
   };
 
@@ -183,13 +159,24 @@ export default function LiveFormsPage() {
   // ... (JSX for the form remains largely the same)
   return (
     <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
-      <div className="pb-2 text-center text-lg text-white">
+      <div className="pb-2 text-center text-xl text-white">
         <h1>{formid}</h1>
       </div>
-      <div className="text-md pb-2 text-center text-white">
+
+      <Image
+        src="/LogoIverKids.jpeg"
+        alt="LogoIverKids"
+        width={140}
+        height={0}
+        quality={100}
+        className="mx-auto mb-2 mb-4 block rounded-lg object-cover"
+      />
+
+      <div className="text-md pb-4 text-center text-white">
         <p>
-          Si tienes el deseo de aprender, solo ingresa tus datos y pon atención
-          a las fechas que se informarán
+          Si deseas ser parte del equipo Iverkids y preparar a los nuevos
+          embajadores del reino de los cielos, te invitamos a completar los
+          datos del formulario
         </p>
       </div>
 
@@ -198,7 +185,7 @@ export default function LiveFormsPage() {
           className="mb-4 rounded-lg bg-red-50 p-4 text-center text-sm text-red-800 dark:bg-gray-800 dark:text-red-400"
           role="alert"
         >
-          Usted ya está inscrito para participar en un IverCapacita
+          Usted ya está inscrit@!
         </div>
       )}
 
@@ -310,114 +297,32 @@ export default function LiveFormsPage() {
             />
           </div>
 
-          {(formid === "IverCapacitaReforzamiento" ||
-            formid === "IverCapacitaIngles") && (
-            <div>
-              <label
-                htmlFor="apoderado"
-                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Nombres y Apellidos Apoderado
-              </label>
+          <div>
+            <label
+              htmlFor="ref_asignatura"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              ¿Actualmente hace clases en algún establecimiento eduacional?
+            </label>
+            <select
+              id="ref_asignatura"
+              name="ref_asignatura"
+              value={form.ref_asignatura}
+              onChange={handleChange}
+              className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              required
+            >
+              <option value="NO">No</option>
+              <option value="SI">Si</option>
+            </select>
+          </div>
 
-              <input
-                type="text"
-                id="apoderado"
-                name="apoderado"
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                placeholder="Nombres y Apellidos Apoderado"
-                value={form.apoderado}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          )}
-          {(formid === "IverCapacitaReforzamiento" ||
-            formid === "IverCapacitaIngles") && (
-            <div>
-              <label
-                htmlFor="contactoapoderado"
-                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Teléfono contacto apoderado
-              </label>
-
-              <input
-                type="tel"
-                id="contactoapoderado"
-                name="contactoapoderado"
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                placeholder="999999999"
-                value={form.contactoapoderado}
-                onChange={handleChange}
-                required
-                pattern="^\d{9}$"
-                // Si quieres validar formato chileno, podrías usar un pattern:
-              />
-            </div>
-          )}
-
-          {formid === "IverCapacitaReforzamiento" && (
-            <div>
-              <label
-                htmlFor="ref_asignatura"
-                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                ¿Qué asignatura necesitas reforzar?
-              </label>
-              <select
-                id="ref_asignatura"
-                name="ref_asignatura"
-                value={form.ref_asignatura}
-                onChange={handleChange}
-                className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                required
-              >
-                <option value="">Seleccione</option>
-                <option value="matematicas">Matemáticas</option>
-                <option value="lenguaje">Lenguaje</option>
-                <option value="ambas">Ambas</option>
-              </select>
-            </div>
-          )}
-
-          {formid === "IverCapacitaIngles" && (
-            <div>
-              <label
-                htmlFor="ref_asignatura"
-                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                ¿Cómo evalua su nivel de inglés?
-              </label>
-              <select
-                id="ref_asignatura"
-                name="ref_asignatura"
-                value={form.ref_asignatura}
-                onChange={handleChange}
-                className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                required
-              >
-                <option value="">Seleccione</option>
-                <option value="Beginner">No se nada de Inglés</option>
-                <option value="Basic">Tengo un Inglés muy básico</option>
-                <option value="Elementary">
-                  Puedo llevar una conversación simple. Necesito mejorar
-                </option>
-                <option value="Pre-Intermediate">
-                  Puedo tener una conversación con tiempos verbales más compleja
-                </option>
-              </select>
-            </div>
-          )}
-        </div>
-
-        {formid === "IverCapacitaReforzamiento" && form.ref_asignatura ? (
           <div>
             <label
               htmlFor="ref_grupo"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              ¿En que nivel educacional te encuentras?
+              ¿Ha participado antes en escuelas para niños en alguna iglesia?
             </label>
 
             <select
@@ -428,55 +333,11 @@ export default function LiveFormsPage() {
               className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               required
             >
-              <option value="">Seleccione</option>
-              <option value="Basico1">1ro básico</option>
-              <option value="Basico2">2do básico</option>
-              <option value="Basico3">3ro básico</option>
-              <option value="Basico4">4to básico</option>
-              <option value="Basico5">5to básico</option>
-              <option value="Basico6">6to básico</option>
-              <option value="Basico7">7mo básico</option>
-              <option value="Basico8">8vo básico</option>
-              <option value="EMedia1">1ro Medio</option>
-              <option value="EMedia2">2do Medio</option>
-              <option value="EMedia3">3ro Medio</option>
-              <option value="EMedia4">4to Medio</option>
+              <option value="NO">No</option>
+              <option value="SI">Si</option>
             </select>
           </div>
-        ) : (
-          []
-        )}
-        {/* ✅ New Checkbox Group for ref_target */}
-        {formid === "IverCapacitaReforzamiento" &&
-          form.ref_asignatura &&
-          form.ref_grupo && (
-            <div className="mb-6">
-              <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                ¿Qué tipo de dificultad presenta el estudiante en esas áreas?
-              </label>
-              <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
-                {AvailableTargets.map((option) => (
-                  <div key={option.value} className="flex items-center">
-                    <input
-                      id={option.value}
-                      type="checkbox"
-                      name="ref_target"
-                      value={option.value}
-                      checked={form.ref_target.includes(option.value)}
-                      onChange={handleCheckboxChange}
-                      className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
-                    />
-                    <label
-                      htmlFor={option.value}
-                      className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                    >
-                      {option.label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        </div>
 
         {/* ... (Buttons) ... */}
         {form.rut &&

@@ -14,11 +14,11 @@ export default function FormsPageDashboard() {
 
   const formsData = [
     {
-      formId: "196923hdfjsd",
-      formName: "IverCapacita",
-      formCategory: "Encuesta",
-      formWorkSpace: "IverCapacita",
-      formCreatedAt: "30-08-2025",
+      formId: "fffa23554gscg",
+      formName: "PostulaIverKids",
+      formCategory: "Formulario",
+      formWorkSpace: "PostulaIverKids",
+      formCreatedAt: "10-01-2026",
       formAnswers: 50,
       formLimitAnswers: 900,
       formStatus: "Active",
@@ -34,7 +34,7 @@ export default function FormsPageDashboard() {
       formStatus: "Paused",
     },
     {
-      formId: "196923hdfjsd",
+      formId: "19692fdsfdfjsd",
       formName: "IverActualiza",
       formCategory: "Encuesta",
       formWorkSpace: "No",
@@ -388,7 +388,7 @@ export default function FormsPageDashboard() {
                           </label>
                         </div>
                       </td>
-                      <Link href={`/forms/live3/${singleFormId}`}>
+                      <Link href={`/forms/live/${frm.formName}`}>
                         <th
                           scope="row"
                           className="flex items-center px-4 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-white"
