@@ -6,22 +6,20 @@ import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
 import Link from "next/link";
-// 1. Importar SweetAlert2
 import Swal from "sweetalert2";
-
-interface CheckboxOption {
-  label: string;
-  value: string;
-}
 
 interface FinanceEntryForm {
   rut: string;
   name: string;
   last_name: string;
+  second_last_name: string;
   phone: string;
+  apoderado: string;
+  contactoapoderado: string;
   ivercapacita: string;
-  fec_nac: string;
+  ref_asignatura: string;
   ref_grupo: string;
+  ref_target: string[]; // ✅ Corrected type: array of strings
 }
 
 export default function LiveFormsPage2() {
@@ -33,60 +31,46 @@ export default function LiveFormsPage2() {
   const search = useSearchParams();
   const program = search.get("program") ?? "";
 
-  // 2. Eliminar showModal ya que SweetAlert2 lo reemplazará
-  // const [showModal, setShowModal] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); // Mantener este para el error dentro del formulario si lo prefieres
+  const [showModal, setShowModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   const [sendind, setIsSending] = useState(false);
   const [insertError, setSaveError] = useState<string | null>(null);
 
-  // 3. Función reemplazada para mostrar SweetAlert2 de éxito
   const handleShowConfirm = () => {
     Swal.fire({
+      title: "Muchas gracias por inscribirse",
+      text: "Pronto le contactarán para una breve entrevista",
       icon: "success",
-      title: "¡Felicidades!",
-      text: `Ha quedado inscrit@ para ${form.ivercapacita}!!`,
-      showConfirmButton: false,
-      timer: 3000,
     });
 
-    // Si quieres redirigir después de la alerta, usa la promesa de Swal
-    // Swal.fire({...}).then(() => {
-    //   router.push(`/forms/workspace/IverCapacita`);
-    // });
-  };
+    // setShowModal(true);
 
-  // Función para mostrar SweetAlert2 de error
-  const handleShowErrorAlert = (message: string) => {
-    Swal.fire({
-      icon: "error",
-      title: "Error de Inscripción",
-      text: message,
-      confirmButtonText: "Entendido",
-    });
-    // Opcionalmente, puedes mantener la alerta interna si quieres:
-    // setShowAlert(true);
     // setTimeout(() => {
-    //   setShowAlert(false);
-    // }, 5000);
+    //   setShowModal(false);
+    //   // router.push(`/forms/workspace/PostulaIverKids`);
+    // }, 2000);
   };
 
-  // Eliminamos la función original handleShowAlert si solo se usaba para el error.
-  // const handleShowAlert = () => {
-  //   setShowAlert(true);
-  //   setTimeout(() => {
-  //     setShowAlert(false);
-  //   }, 5000);
-  // };
+  const handleShowAlert = () => {
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 5000);
+  };
 
   const [form, setForm] = useState<FinanceEntryForm>({
     rut: "",
     name: "",
     last_name: "",
+    second_last_name: "",
     phone: "",
     ivercapacita: formid,
-    fec_nac: "",
+    contactoapoderado: "",
+    apoderado: "",
+    ref_asignatura: "",
     ref_grupo: "",
+    ref_target: [], // ✅ Initial state with an empty array
   });
 
   const handleChange = (
@@ -96,6 +80,26 @@ export default function LiveFormsPage2() {
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+
+    setForm((prevForm) => {
+      if (checked) {
+        // ✅ Add the value to the ref_target array
+        return {
+          ...prevForm,
+          ref_target: [...prevForm.ref_target, value],
+        };
+      } else {
+        // ✅ Remove the value from the ref_target array
+        return {
+          ...prevForm,
+          ref_target: prevForm.ref_target.filter((item) => item !== value),
+        };
+      }
+    });
   };
 
   useEffect(() => {
@@ -112,6 +116,8 @@ export default function LiveFormsPage2() {
       .insert([
         {
           ...form,
+          // Convert array to string for Supabase TEXT column if needed
+          // ref_target: form.ref_target.join(','),
         },
       ]);
 
@@ -121,89 +127,65 @@ export default function LiveFormsPage2() {
         insertError.message,
       );
       setSaveError(insertError.message);
-
-      // 4. Usar SweetAlert2 para el error
-      handleShowErrorAlert(
-        "Usted ya está inscrito o hubo un error: " + insertError.message,
-      );
-
+      handleShowAlert();
       setForm({
         rut: "",
         name: "",
         last_name: "",
+        second_last_name: "",
         phone: "",
-        fec_nac: "",
+        apoderado: "",
+        contactoapoderado: "",
         ivercapacita: formid,
+        ref_asignatura: "",
         ref_grupo: "",
+        ref_target: [], // ✅ Reset the form correctly
       });
-      setIsSending(false); // Mover aquí para que el botón se habilite si falla
       return;
     } else {
       console.log("Registro guardado exitosamente");
-      // Limpiar formulario y mostrar SweetAlert de éxito
       setForm({
         rut: "",
         name: "",
         last_name: "",
+        second_last_name: "",
         phone: "",
-        fec_nac: "",
+        apoderado: "",
+        contactoapoderado: "",
         ivercapacita: formid,
+        ref_asignatura: "",
         ref_grupo: "",
+        ref_target: [],
       });
-      handleShowConfirm();
     }
 
     setIsSending(false);
+    handleShowConfirm();
   };
 
   // ... (JSX for the form remains largely the same)
   return (
     <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
-      <div className="pb-5 text-center text-2xl font-bold text-white">
-        {/* <h1>{formid}</h1> */}
-        <p>Levántate y Resplandece - Aviva, 2025 Noviembre 22</p>
+      <div className="pb-2 text-center text-xl text-white">
+        <h1>{formid}</h1>
       </div>
-      <div className="pb-3 text-center text-sm text-white">
-        <Image
-          src="/ImagenAviva.jpeg"
-          alt="Levántate y Resplandece - Aviva"
-          width={270}
-          height={0}
-          quality={100}
-          className="m-2 mx-auto block rounded-lg object-cover"
-        />
-        <p className="m-2 text-lg font-bold">
-          Le recordamos que el valor de inscripción es de $5.000 e incluye el
-          almuerzo
-        </p>
-        <hr />
-        <p className="mt-2 font-bold">
-          Si desea pagar con transferencia, puede hacerlo a la siguiente cuenta:
-        </p>
-        <p>Nombre: Jacqueline Espinoza </p>
-        <p>Rut: 14342646-7</p>
-        <p>Banco: BCI</p>
-        <p>Cuenta: Cuenta vista</p>
-        <p className="mb-2">Número de cuenta: 41500130</p>
-        <hr />
-        <p className="m-2 font-bold italic">
-          * Pagos en efectivo directamente en Iver el día del evento
-        </p>
-        <hr />
-      </div>
-      <div className="pb-4 text-center text-lg font-bold text-white">
-        <p>Ingrese sus datos para finalizar su inscripción</p>
-      </div>
-      {/* 5. Dejar este mensaje de error solo si quieres la alerta interna además de SweetAlert2 */}
-      {showAlert && (
-        <div
-          className="mb-4 rounded-lg bg-red-50 p-4 text-center text-sm text-red-800 dark:bg-gray-800 dark:text-red-400"
-          role="alert"
-        >
-          Usted ya está inscrito para participar en Aviva
-        </div>
-      )}
 
+      {/* <Image
+        src="/LogoIverKids.jpeg"
+        alt="LogoIverKids"
+        width={140}
+        height={0}
+        quality={100}
+        className="mx-auto mb-2 mb-4 block rounded-lg object-cover"
+      /> */}
+
+      <div className="text-md pb-4 text-center text-white">
+        <p>
+          Si deseas ser parte de los equipos de trabajo de Iver: Relaciones
+          Públicas y Estacionamientos, te invitamos a completar tus datos en el
+          siguiente link.
+        </p>
+      </div>
       <form className="sm:align-center pr-10 pl-10">
         <div className="mb-6 grid gap-4">
           <div>
@@ -215,17 +197,19 @@ export default function LiveFormsPage2() {
             </label>
 
             <input
-              type="number"
+              type="text"
               id="rut"
               name="rut"
+              maxLength={8}
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               placeholder="12345678"
               value={form.rut}
               onChange={handleChange}
               required
-              autoComplete="given-name"
+              autoComplete="off"
             />
           </div>
+
           <div>
             <label
               htmlFor="name"
@@ -239,7 +223,7 @@ export default function LiveFormsPage2() {
               id="name"
               name="name"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Nombres"
+              placeholder="John"
               value={form.name}
               onChange={handleChange}
               required
@@ -252,7 +236,7 @@ export default function LiveFormsPage2() {
               htmlFor="last_name"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Apellidos
+              Apellido Paterno
             </label>
 
             <input
@@ -260,27 +244,48 @@ export default function LiveFormsPage2() {
               id="last_name"
               name="last_name"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Apellidos"
+              placeholder="Apellido Paterno"
               value={form.last_name}
               onChange={handleChange}
               required
               autoComplete="family-name"
             />
           </div>
+
+          <div>
+            <label
+              htmlFor="second_last_name"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Apellido Materno
+            </label>
+
+            <input
+              type="text"
+              id="second_last_name"
+              name="second_last_name"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder="Apellido Materno"
+              value={form.second_last_name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
           <div>
             <label
               htmlFor="phone"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Número de contacto
+              Teléfono
             </label>
 
             <input
-              type="phone"
+              type="tel"
               id="phone"
               name="phone"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="9123456789"
+              placeholder="999999999"
               value={form.phone}
               onChange={handleChange}
               required
@@ -288,26 +293,25 @@ export default function LiveFormsPage2() {
               // pattern="^\d{9}$"
             />
           </div>
-          <div>
+
+          {/* <div>
             <label
-              htmlFor="fec_nac"
+              htmlFor="ref_asignatura"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Fecha de nacimiento
+              ¿Actualmente hace clases en algún establecimiento eduacional?
             </label>
-
-            <input
-              type="date"
-              id="fec_nac"
-              name="fec_nac"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder=""
-              value={form.fec_nac}
+            <select
+              id="ref_asignatura"
+              name="ref_asignatura"
+              value={form.ref_asignatura}
               onChange={handleChange}
+              className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               required
-              // Si quieres validar formato chileno, podrías usar un pattern:
-              // pattern="^\d{9}$"
-            />
+            >
+              <option value="NO">No</option>
+              <option value="SI">Si</option>
+            </select>
           </div>
 
           <div>
@@ -315,8 +319,9 @@ export default function LiveFormsPage2() {
               htmlFor="ref_grupo"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Eres parte de la casa Iver?
+              ¿Ha participado antes en escuelas para niños en alguna iglesia?
             </label>
+
             <select
               id="ref_grupo"
               name="ref_grupo"
@@ -325,33 +330,86 @@ export default function LiveFormsPage2() {
               className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               required
             >
-              <option value="">Seleccione</option>
-              <option value="SI">Si</option>
               <option value="NO">No</option>
+              <option value="SI">Si</option>
             </select>
-          </div>
+          </div> */}
         </div>
 
         {/* ... (Buttons) ... */}
         {form.rut &&
           form.name &&
           form.last_name &&
-          form.phone &&
-          form.fec_nac &&
-          form.ref_grupo && (
+          form.second_last_name &&
+          form.phone && (
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={sendind} // Deshabilitar mientras se envía
-              className={`me-2 mb-2 w-full cursor-pointer rounded-lg px-5 py-2.5 text-sm font-medium text-white ${sendind ? "bg-gray-500" : "bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"}`}
+              className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
             >
-              {sendind ? "Enviando..." : "Enviar ✅"}
+              Enviar ✅
             </button>
           )}
+
+        <Link href={`/forms/workspace/IverCapacita`}>
+          <button
+            type="button"
+            className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-600"
+          >
+            Regresar ⬅️
+          </button>
+        </Link>
       </form>
 
-      {/* 6. Eliminar el JSX del toast-success anterior */}
-      {/* {showModal && (...) } */}
+      {showModal && (
+        <div
+          id="toast-success"
+          className="fixed top-4 right-4 z-50 mb-4 flex w-full max-w-xs items-center rounded-lg bg-white p-4 text-gray-700 shadow-lg dark:bg-gray-800 dark:text-gray-200"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200">
+            <svg
+              className="h-5 w-5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+            </svg>
+
+            <span className="sr-only">Felicidades</span>
+          </div>
+
+          <div className="ms-3 text-sm font-medium">
+            Felicidades!! has quedado inscrito para {form.ivercapacita} !!
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowModal(false)}
+            className="-mx-1.5 -my-1.5 ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 focus:ring-2 focus:ring-gray-300 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white"
+            aria-label="Cerrar"
+          >
+            <svg
+              className="h-3 w-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

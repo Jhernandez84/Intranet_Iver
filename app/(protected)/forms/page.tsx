@@ -25,29 +25,19 @@ export default function FormsPageDashboard() {
     },
     {
       formId: "196923hdfjsd",
-      formName: "IverCapa",
-      formCategory: "Evento",
+      formName: "IverEquipos",
+      formCategory: "Formulario",
       formWorkSpace: "No",
-      formCreatedAt: "20-08-2025",
+      formCreatedAt: "10-01-2026",
       formAnswers: 25,
       formLimitAnswers: 900,
-      formStatus: "Paused",
-    },
-    {
-      formId: "19692fdsfdfjsd",
-      formName: "IverActualiza",
-      formCategory: "Encuesta",
-      formWorkSpace: "No",
-      formCreatedAt: "17-08-2025",
-      formAnswers: 10,
-      formLimitAnswers: 900,
-      formStatus: "Closed",
+      formStatus: "Active",
     },
   ];
 
   const handleNavigate = (formId: string) => {
     // ✅ Navega a la ruta dinámicamente usando el router
-    router.push(`/forms/live3/${formId}`);
+    router.push(`/forms/live/${formId}`);
   };
 
   const handleCreateForm = () => {
