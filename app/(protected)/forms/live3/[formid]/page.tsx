@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import Swal from "sweetalert2";
 import Link from "next/link";
 
 interface CheckboxOption {
@@ -18,9 +19,10 @@ interface FinanceEntryForm {
   ivercapacita: string;
   contactoapoderado: string;
   ref_grupo: string;
+  ref_asignatura: string;
 }
 
-export default function LiveFormsPage2() {
+export default function LiveFormsPage3() {
   const supabase = createClientComponentClient();
 
   const router = useRouter();
@@ -36,12 +38,11 @@ export default function LiveFormsPage2() {
   const [insertError, setSaveError] = useState<string | null>(null);
 
   const handleShowConfirm = () => {
-    setShowModal(true);
-
-    setTimeout(() => {
-      setShowModal(false);
-      // router.push(`/forms/workspace/IverCapacita`);
-    }, 2000);
+    Swal.fire({
+      title: `${form.name}, muchas gracias por inscribirse`,
+      text: "Estaremos esperándote",
+      icon: "success",
+    });
   };
 
   const handleShowAlert = () => {
@@ -58,6 +59,7 @@ export default function LiveFormsPage2() {
     ivercapacita: formid,
     contactoapoderado: "",
     ref_grupo: "",
+    ref_asignatura: "",
   });
 
   const handleChange = (
@@ -122,6 +124,7 @@ export default function LiveFormsPage2() {
         ivercapacita: formid,
         contactoapoderado: "",
         ref_grupo: "",
+        ref_asignatura: "",
       });
       return;
     } else {
@@ -133,6 +136,7 @@ export default function LiveFormsPage2() {
         ivercapacita: formid,
         contactoapoderado: "",
         ref_grupo: "",
+        ref_asignatura: "",
       });
     }
 
@@ -145,18 +149,21 @@ export default function LiveFormsPage2() {
     <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
       <div className="pb-5 text-center text-2xl font-bold text-white">
         {/* <h1>{formid}</h1> */}
-        <p>4to Seminario de Matrimonios - Pacto - Noviembre 8, 2025</p>
+        <p>1er Seminario de Danza Febrero 2026 - IverChile</p>
       </div>
-      <div className="pb-3 text-center text-sm text-white">
+      <div className="text-md pb-3 text-center text-white">
         <p>
-          Atención matrimonios de IverChile, una nueva instancia para crecer y
-          ser edificados en pareja está por comenzar. Si desea fortalecer su
-          relación en Dios a través de su palabra, no falten, registrense y
-          reserven la fecha!!
+          Si lo tuyo es la danza y quieres dar lo mejor en cada paso, este
+          seminario es para ti. Participar es muy facil, solo ingresa los datos
+          para completar tu inscripción.
+        </p>
+        <p className="pt-2 text-sm font-bold italic">
+          * Te recordamos que este seminario tiene un valor de inscripción de
+          $10.000 e incluye el almuerzo.
         </p>
       </div>
       <div className="text-md pb-4 text-center text-white">
-        <p>Ingrese sus datos aquí si quiere participar</p>
+        <p>Ingrese sus datos aquí para participar</p>
       </div>
       {showAlert && (
         <div
@@ -174,7 +181,7 @@ export default function LiveFormsPage2() {
               htmlFor="name"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Esposo (nombre y apellidos)
+              Nombre completo
             </label>
 
             <input
@@ -192,10 +199,10 @@ export default function LiveFormsPage2() {
 
           <div>
             <label
-              htmlFor="last_name"
+              htmlFor="Apellidos"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Esposa (nombre y apellidos)
+              Apellidos
             </label>
 
             <input
@@ -215,7 +222,7 @@ export default function LiveFormsPage2() {
               htmlFor="number"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Edad (hombre, mujer)
+              Edad
             </label>
 
             <input
@@ -223,7 +230,7 @@ export default function LiveFormsPage2() {
               id="phone"
               name="phone"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="32, 30"
+              placeholder=""
               value={form.phone}
               onChange={handleChange}
               required
@@ -273,6 +280,29 @@ export default function LiveFormsPage2() {
               <option value="NO">No</option>
             </select>
           </div>
+          {form.ref_grupo === "NO" ? (
+            <div>
+              <label
+                htmlFor="ref_grupo"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                ¿De que iglesia nos visitarás?
+              </label>
+              <input
+                type="ref_asignatura"
+                id="ref_asignatura"
+                name="ref_asignatura"
+                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                placeholder={form.ref_asignatura}
+                value={form.ref_asignatura}
+                onChange={handleChange}
+                required
+                // autoComplete="given-name"
+              />
+            </div>
+          ) : (
+            []
+          )}
         </div>
 
         {/* ... (Buttons) ... */}
@@ -280,7 +310,8 @@ export default function LiveFormsPage2() {
           form.last_name &&
           form.phone &&
           form.ref_grupo &&
-          form.contactoapoderado && (
+          form.contactoapoderado &&
+          form.ref_asignatura && (
             <button
               type="button"
               onClick={handleSubmit}
