@@ -147,22 +147,26 @@ export default function LiveFormsPage3() {
   // ... (JSX for the form remains largely the same)
   return (
     <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
-      <div className="pb-5 text-center text-2xl font-bold text-white">
+      <div className="pb-5 text-center text-2xl font-bold text-white italic">
         {/* <h1>{formid}</h1> */}
-        <p>1er Seminario de Danza Febrero 2026 - IverChile</p>
+        <p>Seminario de Danza Raíces profeticas - 21 de Febrero en IverChile</p>
       </div>
-      <div className="text-md pb-3 text-center text-white">
+      <div className="text-md gap-3 pb-3 text-center text-white">
+        <p className="pb-2">
+          Te Invitamos a ser parte de Nuestro primer seminario, el cual estará
+          enfocado en el origen de la danza y dónde nace tu adoración.
+        </p>
         <p>
-          Si lo tuyo es la danza y quieres dar lo mejor en cada paso, este
-          seminario es para ti. Participar es muy facil, solo ingresa los datos
-          para completar tu inscripción.
+          Ven a descubrir lo que el Espíritu Santo quiere revelar a tu Vida y
+          así adquirir conocimientos que ayudarán en tu crecimiento espiritual y
+          personal para el desarrollo de tu ministerio.
         </p>
         <p className="pt-2 text-sm font-bold italic">
           * Te recordamos que este seminario tiene un valor de inscripción de
           $10.000 e incluye el almuerzo.
         </p>
       </div>
-      <div className="text-md pb-4 text-center text-white">
+      <div className="text-md border-t p-4 text-center text-white">
         <p>Ingrese sus datos aquí para participar</p>
       </div>
       {showAlert && (

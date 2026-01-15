@@ -53,9 +53,15 @@ export default function CardComponent({
             </dd>
           </dl>
           <div>
-            {actionButton && (
-              <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700">
-                {actionButton}
+            {actionButton && actionButton2 && (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700">
+                  {actionButton}
+                </div>
+
+                <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700">
+                  {actionButton2}
+                </div>
               </div>
             )}
 

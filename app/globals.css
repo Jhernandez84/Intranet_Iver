@@ -11,3 +11,29 @@
 html {
   scroll-behavior: smooth;
 }
+
+@media print {
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+  }
+
+  h1,
+  h2 {
+    margin-bottom: 6px;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid #000;
+  }
+
+  th {
+    background: #f0f0f0;
+  }
+
+  @page {
+    margin: 30mm;
+  }
+}

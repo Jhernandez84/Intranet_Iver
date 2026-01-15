@@ -5,6 +5,11 @@ import CardComponent from "../components/CardComponent/CardComponent";
 import MovementsTable from "../components/MovementsTable/MovementsTable";
 import FinanceEntryDataForm from "../components/FinanceEntryData/FinanceEntryDataForm";
 import { useFinanceData } from "../_Context/FinancesProvider";
+import { exportFinanzasPDF } from "../exportData/ExportFinanzasPDF";
+import { openFinanzasPrintReport } from "./openPrintReports";
+
+import { useUser } from "../../../context/UserProvider";
+// import { useUserAccess } from "../../../context/UserAccessProvider";
 
 interface FinanceEntryForm {
   // Unificamos fecha como string "YYYY-MM-DD" para ser 100% compatible con el provider y los inputs
@@ -34,6 +39,8 @@ const baseRecordForm: FinanceEntryForm = {
 };
 
 export default function DashboardFinance() {
+  const { user } = useUser();
+
   const [open, setOpen] = useState(false);
   const { refreshFinanceMovements } = useFinanceData();
 
@@ -55,16 +62,22 @@ export default function DashboardFinance() {
     </button>
   );
 
-  const ActionButtonExportExcel = (
+  const ActionButtonToPdfSimple = (
     <button
-    // onClick={() => refreshFinanceMovements()}
+      className="btn btn-outline"
+      onClick={() => openFinanzasPrintReport(user?.company_id, user?.sede_id)}
     >
-      🖨️ Exportar Excel
+      🖨️ Generar PDF (simple)
     </button>
   );
+
+  const ActionButtonExportExcel = (
+    <button onClick={() => refreshFinanceMovements()}>🖨️ Exportar Excel</button>
+  );
+
   const ActionButtonToPdf = (
     <button
-    // onClick={() => refreshFinanceMovements()}
+      onClick={() => openFinanzasPrintReport(user?.company_id, user?.sede_id)}
     >
       🖨️ Generar PDF
     </button>
