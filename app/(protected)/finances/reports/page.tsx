@@ -1,30 +1,43 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic"; // Importante para evitar errores de SSR
 import CardComponent from "../components/CardComponent/CardComponent";
 import MovementsTable from "../components/MovementsTable/MovementsTable";
 import FinanceEntryDataForm from "../components/FinanceEntryData/FinanceEntryDataForm";
 import { useFinanceData } from "../_Context/FinancesProvider";
-import { exportFinanzasPDF } from "../exportData/ExportFinanzasPDF";
-import { openFinanzasPrintReport } from "./openPrintReports";
 
-import { useUser } from "../../../context/UserProvider";
-// import { useUserAccess } from "../../../context/UserAccessProvider";
+import { MovimientoFinanciero } from "./print/ReportButtonComponent";
+
+/** * Importación dinámica del botón de reporte.
+ * Esto asegura que la librería PDF solo se cargue en el navegador del usuario.
+ */
+const ReportButton = dynamic(
+  () => import("./print/ReportButtonComponent").then((mod) => mod.ReportButton),
+  { ssr: false },
+);
+
+const ReportButtonResumen = dynamic(
+  () =>
+    import("./print/ReportButtonComponent").then(
+      (mod) => mod.ReportButtonResumen,
+    ),
+  { ssr: false },
+);
 
 interface FinanceEntryForm {
-  // Unificamos fecha como string "YYYY-MM-DD" para ser 100% compatible con el provider y los inputs
   fecha: string;
   tipo: string;
   tipo_mov: string;
   metodo_pago: string;
-  monto: string; // string para input number; casteamos al guardar
+  monto: string;
   num_doc: string;
   observaciones: string;
   estado: string;
   sede_id?: string | null;
 }
 
-const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+const todayStr = new Date().toISOString().slice(0, 10);
 
 const baseRecordForm: FinanceEntryForm = {
   fecha: todayStr,
@@ -39,10 +52,13 @@ const baseRecordForm: FinanceEntryForm = {
 };
 
 export default function DashboardFinance() {
-  const { user } = useUser();
-
+  const { financeMovements, refreshFinanceMovements } = useFinanceData();
   const [open, setOpen] = useState(false);
-  const { refreshFinanceMovements } = useFinanceData();
+
+  const movimientosTipados =
+    financeMovements as unknown as MovimientoFinanciero[];
+
+  // --- BOTONES DE ACCIÓN ---
 
   const ActionButton = (
     <button
@@ -62,40 +78,31 @@ export default function DashboardFinance() {
     </button>
   );
 
-  const ActionButtonToPdfSimple = (
-    <button
-      className="btn btn-outline"
-      onClick={() => openFinanzasPrintReport(user?.company_id, user?.sede_id)}
-    >
-      🖨️ Generar PDF (simple)
-    </button>
+  /**
+   * REEMPLAZO: Este es el nuevo botón que genera el PDF.
+   * Le pasamos los 'financeMovements' que vienen del Context.
+   */
+  const ActionButtonToPdf = <ReportButton movimientos={movimientosTipados} />;
+
+  const ActionButtonToPdf2 = (
+    <ReportButtonResumen movimientos={movimientosTipados} />
   );
 
-  const ActionButtonExportExcel = (
-    <button onClick={() => refreshFinanceMovements()}>🖨️ Exportar Excel</button>
-  );
-
-  const ActionButtonToPdf = (
-    <button
-      onClick={() => openFinanzasPrintReport(user?.company_id, user?.sede_id)}
-    >
-      🖨️ Generar PDF
-    </button>
-  );
+  // --- RENDEREADO ---
 
   return (
     <>
       <FinanceEntryDataForm
-        initialValues={baseRecordForm} // ✅ pasa un objeto válido
+        initialValues={baseRecordForm}
         editView={false}
-        movementId="" // ✅ requerido por las props
+        movementId=""
         openModal={open}
         setOpenModal={setOpen}
       />
+
       <div className="grid h-full grid-rows-[200px_1fr] gap-4">
         <div>
           <div className="grid h-full w-full grid-cols-2 gap-2">
-            {/* <div className="h-full w-full"> */}
             <CardComponent
               label="Balance de esta semana"
               period="WTD"
@@ -105,13 +112,12 @@ export default function DashboardFinance() {
               label="Balance del mes"
               period="MTD"
               actionButton={ActionButtonRefresh}
-              actionButton2={ActionButtonToPdf}
+              actionButton2={ActionButtonToPdf2} // <--- Inyectamos el nuevo botón aquí
+              // actionButton3={ActionButtonToPdf2} // <--- Inyectamos el nuevo botón aquí
             />
-            {/* </div> */}
           </div>
         </div>
 
-        {/* Segunda fila (40%) */}
         <div className="h-full w-full overflow-hidden">
           <MovementsTable />
         </div>
