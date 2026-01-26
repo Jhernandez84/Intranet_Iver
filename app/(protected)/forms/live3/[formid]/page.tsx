@@ -314,8 +314,7 @@ export default function LiveFormsPage3() {
           form.last_name &&
           form.phone &&
           form.ref_grupo &&
-          form.contactoapoderado &&
-          form.ref_asignatura && (
+          form.contactoapoderado && (
             <button
               type="button"
               onClick={handleSubmit}

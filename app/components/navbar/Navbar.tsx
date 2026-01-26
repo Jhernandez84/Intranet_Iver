@@ -180,7 +180,7 @@ const Navbar = () => {
               </>
             )}
           </div>
-          <div className="flex items-center lg:order-2">
+          <div className="flex items-center gap-2 lg:order-2">
             {spuser ? (
               <>
                 <button

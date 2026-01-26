@@ -9,6 +9,7 @@ import { useFinanceData } from "../../_Context/FinancesProvider";
 import { groupByMesTipoForChartPretty } from "../../helper/FinanceDataOutputs";
 import { getTotalsByTipo } from "../../helper/FinanceDataOutputs";
 import { formatCurrency } from "../../helper/FinanceDataOutputs";
+import { FinanceFiltersComponent } from "../Filters/FinancesFilters";
 import {
   getDateRange,
   type DateRangeKey,
@@ -183,7 +184,8 @@ const FinanceBarChart = ({
 
       <div className="grid grid-cols-2 items-center justify-between border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between pt-5">
-          <Dropdown
+          <FinanceFiltersComponent />
+          {/* <Dropdown
             label=""
             dismissOnClick={true}
             renderTrigger={() => (
@@ -218,14 +220,8 @@ const FinanceBarChart = ({
             >
               Este año
             </DropdownItem>
-            {/* <DropdownItem
-              onClick={() => {
-                setDateRange("CUSTOM");
-              }}
-            >
-              Seleccionar Rango
-            </DropdownItem> */}
-          </Dropdown>
+
+          </Dropdown> */}
         </div>
 
         <div className="flex items-center justify-between pt-5"></div>

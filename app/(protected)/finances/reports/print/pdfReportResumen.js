@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
     fontWeight: "bold",
-    textTransform: "uppercase",
+    // textTransform: "uppercase",
   },
   sedeSection: { marginBottom: 25 },
   sedeHeader: {
@@ -59,15 +59,16 @@ const styles = StyleSheet.create({
 export const MyReportResumen = ({ data }) => (
   <Document>
     <Page style={styles.page}>
-      <Text style={styles.title}>Resumen Ejecutivo de Finanzas</Text>
+      <Text style={styles.title}>Resumen de movimientos del periodo</Text>
 
       {Object.values(data).map((sede) => (
         <View key={sede.nombresede} style={styles.sedeSection}>
           {/* Nombre de la Sede */}
-          <Text style={styles.sedeHeader}>{sede.nombresede.toUpperCase()}</Text>
+          {/* <Text style={styles.sedeHeader}>{sede.nombresede.toUpperCase()}</Text> */}
+          <Text style={styles.sedeHeader}>{sede.nombresede}</Text>
 
           {/* Bloque de Ingresos */}
-          <Text style={styles.typeHeader}>INGRESOS POR CATEGORÍA</Text>
+          <Text style={styles.typeHeader}>Ingreso</Text>
           {Object.entries(sede.ingresos).map(([cat, monto]) => (
             <View key={cat} style={styles.tableRow}>
               <Text style={styles.colLabel}>{cat}</Text>
@@ -82,7 +83,7 @@ export const MyReportResumen = ({ data }) => (
           </View>
 
           {/* Bloque de Egresos */}
-          <Text style={styles.typeHeader}>EGRESOS POR CATEGORÍA</Text>
+          <Text style={styles.typeHeader}>Egresos</Text>
           {Object.entries(sede.egresos).map(([cat, monto]) => (
             <View key={cat} style={styles.tableRow}>
               <Text style={styles.colLabel}>{cat}</Text>
@@ -99,7 +100,7 @@ export const MyReportResumen = ({ data }) => (
           {/* Balance Neto de la Sede */}
           <View style={styles.balanceBox}>
             <Text style={[styles.colLabel, styles.bold]}>
-              SALDO NETO OPERATIVO
+              Saldo del periodo
             </Text>
             <Text style={[styles.colAmount, styles.bold]}>
               $ {(sede.totalIngresos - sede.totalEgresos).toLocaleString()}

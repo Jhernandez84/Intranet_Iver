@@ -1,36 +1,109 @@
-// app/(dashboard)/layout.tsx
 "use client";
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import SideBarFilters from "./components/SideBarFilters/SideBarFilters";
-import { Datepicker, Dropdown, DropdownItem } from "flowbite-react";
-import { useState } from "react";
 import {
   CompanyFinanceProvider,
   useFinanceData,
 } from "./_Context/FinancesProvider";
 import { CompanyFinanceMovementsTypeProvider } from "./_Context/FinancesMovementsProvider";
 
+// 1. Definimos la interfaz para los items de navegación
+interface FinanceAccessItem {
+  Menu: string;
+  hRef: string;
+  svgPath: string;
+}
+
+/**
+ * COMPONENTE INTERNO
+ */
+function FinancesLayoutContent({
+  children,
+  financesAccess,
+}: {
+  children: React.ReactNode;
+  financesAccess: FinanceAccessItem[]; // Reemplazamos any[] por la interfaz
+}) {
+  const pathname = usePathname();
+
+  // Consumimos el contexto (ahora disponible por estar envuelto en el Provider)
+  const { isLoadingFinanceData } = useFinanceData();
+
+  return (
+    <div className="h-[calc(100vh-70px)] p-2 md:flex">
+      {/* Navegación Lateral */}
+      <ul className="flex-column mb-4 w-full space-y-4 text-sm font-medium text-gray-500 md:me-4 md:mb-0 md:w-64 dark:text-gray-400">
+        {financesAccess.map((access) => {
+          const isActive = pathname === access.hRef;
+
+          const linkClasses = `
+            inline-flex w-full items-center rounded-lg px-4 py-3 transition-colors
+            ${
+              isActive
+                ? "bg-blue-700 text-white dark:bg-blue-600 cursor-default"
+                : "bg-gray-50 hover:bg-gray-200 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
+            }
+          `;
+
+          return (
+            <li key={access.hRef}>
+              <Link href={access.hRef} className={linkClasses}>
+                <svg
+                  className={`me-2 h-4 w-4 ${isActive ? "text-white" : "text-gray-500"}`}
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    d={access.svgPath}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                {access.Menu}
+                {/* 5. Agregamos un indicador visual de carga si es necesario */}
+                {isLoadingFinanceData && isActive && (
+                  <span className="ms-2 h-2 w-2 animate-ping rounded-full bg-blue-300"></span>
+                )}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Área de Contenido Principal */}
+      <div className="w-full overflow-auto rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * EXPORT PRINCIPAL
+ */
 export default function FinancesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const FinancesAccess = [
+  // 3. Tipamos la constante de accesos
+  const FinancesAccess: FinanceAccessItem[] = [
     {
       Menu: "Dashboard",
       hRef: "/finances",
       svgPath:
         "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z",
-      isActive: "",
     },
     {
       Menu: "Reportes",
       hRef: "/finances/reports",
       svgPath:
         "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z",
-      isActive: "",
     },
     {
       Menu: "Ajustes",
@@ -40,80 +113,13 @@ export default function FinancesLayout({
     },
   ];
 
-  const pathname = usePathname();
-
-  const financeMovements = useFinanceData();
-
   return (
-    <>
-      <CompanyFinanceProvider>
-        <CompanyFinanceMovementsTypeProvider>
-          <div className="h-[calc(100vh-70px)] p-2 md:flex">
-            <ul className="active flex-column space-y mb-4 space-y-4 text-sm font-medium text-gray-500 md:me-4 md:mb-0 dark:text-gray-400">
-              <button
-                id="toggleSidebar"
-                aria-expanded="true"
-                data-drawer-target="drawer-navigation"
-                data-drawer-show="drawer-navigation"
-                aria-controls="drawer-navigation"
-                className="mr-3 hidden cursor-pointer rounded p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 lg:inline dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                <svg
-                  className="h-5 w-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 16 12"
-                >
-                  {" "}
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M1 1h14M1 6h14M1 11h7"
-                  />{" "}
-                </svg>
-              </button>
-              <SideBarFilters />
-              {FinancesAccess.map((access) => {
-                const isActive = pathname === access.hRef;
-
-                const linkClasses = `
-            inline-flex w-full items-center rounded-lg px-4 py-3
-            ${
-              isActive
-                ? "bg-blue-700 text-white dark:bg-blue-600 disable"
-                : "bg-gray-50 hover:bg-gray-400 hover:text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-900 dark:hover:text-white"
-            }
-          `;
-
-                return (
-                  <li key={access.hRef}>
-                    <Link href={access.hRef} className={linkClasses}>
-                      <svg
-                        className="me-2 size-4 h-4 w-4 text-gray-500 dark:text-gray-400"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        // className="mx-auto size-6"
-                      >
-                        <path d={access.svgPath} />
-                      </svg>
-                      {access.Menu}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="text-medium w-full rounded-lg bg-gray-50 p-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-              {children}
-            </div>
-          </div>
-        </CompanyFinanceMovementsTypeProvider>
-      </CompanyFinanceProvider>
-    </>
+    <CompanyFinanceProvider>
+      <CompanyFinanceMovementsTypeProvider>
+        <FinancesLayoutContent financesAccess={FinancesAccess}>
+          {children}
+        </FinancesLayoutContent>
+      </CompanyFinanceMovementsTypeProvider>
+    </CompanyFinanceProvider>
   );
 }
