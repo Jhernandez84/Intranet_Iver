@@ -13,24 +13,14 @@ export default function FormsPageDashboard() {
   const router = useRouter();
   const [forms, setForms] = useState([
     {
-      formId: "fffa23554gscg",
-      formName: "PostulaIverKids",
-      formCategory: "Formulario",
-      formWorkSpace: "PostulaIverKids",
-      formCreatedAt: "10-01-2026",
-      formAnswers: 50,
-      formLimitAnswers: 900,
-      formStatus: "Active",
-    },
-    {
-      formId: "196923hdfjsd",
-      formName: "IverEquipos",
+      formId: "LyR_aviva",
+      formName: "LyR_aviva",
       formCategory: "Formulario",
       formWorkSpace: "No",
       formCreatedAt: "10-01-2026",
       formAnswers: 25,
       formLimitAnswers: 900,
-      formStatus: "Active",
+      formStatus: "Inactive",
     },
     {
       formId: "SeminarioDanzaIverChile",
@@ -38,9 +28,29 @@ export default function FormsPageDashboard() {
       formCategory: "Formulario",
       formWorkSpace: "No",
       formCreatedAt: "10-01-2026",
-      formAnswers: 25,
-      formLimitAnswers: 900,
+      formAnswers: null,
+      formLimitAnswers: 100,
       formStatus: "Active",
+    },
+    {
+      formId: "SeminarioMatrimonios2025",
+      formName: "SeminarioMatrimonios2025",
+      formCategory: "Formulario",
+      formWorkSpace: "No",
+      formCreatedAt: "10-01-2026",
+      formAnswers: null,
+      formLimitAnswers: 100,
+      formStatus: "Closed",
+    },
+    {
+      formId: "fiestadelaluz",
+      formName: "fiestadelaluz",
+      formCategory: "Formulario",
+      formWorkSpace: "No",
+      formCreatedAt: "10-01-2026",
+      formAnswers: null,
+      formLimitAnswers: 200,
+      formStatus: "Paused",
     },
   ]);
 
@@ -444,15 +454,21 @@ export default function FormsPageDashboard() {
                       <td className="px-4 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-white">
                         {frm.formCreatedAt}
                       </td>
-                      <td className="grid grid-cols-[25%_75%] px-4 py-2 align-middle whitespace-nowrap text-gray-900 dark:text-white">
-                        <div className="items-center">
-                          <p>{frm.formAnswers}</p>
-                        </div>
-                        <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-900">
-                          <div
-                            className="h-3 rounded-full bg-blue-600 dark:bg-blue-500"
-                            style={{ width: `${frm.formAnswers}%` }} // asegúrate que sea porcentaje
-                          />
+                      <td className="items-center px-3 whitespace-nowrap text-gray-900 dark:text-white">
+                        {/* El número de respuestas */}
+                        <div className="grid grid-cols-[20%_80%] items-center gap-2">
+                          <div className="flex justify-center font-bold">
+                            {frm.formAnswers}
+                          </div>
+                          {/* La barra de progreso */}
+                          <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-900">
+                            <div
+                              className="h-3 rounded-full bg-blue-600 transition-all duration-500 dark:bg-blue-500"
+                              style={{
+                                width: `${Math.min((frm.formAnswers / frm.formLimitAnswers) * 100, 100)}%`,
+                              }}
+                            />
+                          </div>
                         </div>
                       </td>
                       <td className="px-4 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-white">
@@ -473,7 +489,15 @@ export default function FormsPageDashboard() {
                         <div className="flex items-center">
                           {frm.formStatus === "Active" ? (
                             <>
-                              <div className="mr-2 inline-block h-4 w-4 rounded-full bg-green-600"></div>
+                              <div className="mr-2 inline-block h-4 w-4 rounded-full bg-green-700"></div>
+                              {frm.formStatus}
+                            </>
+                          ) : (
+                            []
+                          )}
+                          {frm.formStatus === "Inactive" ? (
+                            <>
+                              <div className="mr-2 inline-block h-4 w-4 rounded-full bg-orange-500"></div>
                               {frm.formStatus}
                             </>
                           ) : (
