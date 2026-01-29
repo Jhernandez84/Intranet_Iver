@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "sync:auth-metadata": "tsx ./app/scripts/syncUserMetadataAccess.ts"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.2",

@@ -4,15 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CreateNewForm from "./_Components/newFormModal";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function FormsPageDashboard() {
+  const supabase = createClientComponentClient();
+
   const [openModalNewForm, setOpenModalNewForm] = useState(false);
-
   const router = useRouter();
-
-  const singleFormId = "SeminarioMatrimonios2025";
-
-  const formsData = [
+  const [forms, setForms] = useState([
     {
       formId: "fffa23554gscg",
       formName: "PostulaIverKids",
@@ -43,7 +42,38 @@ export default function FormsPageDashboard() {
       formLimitAnswers: 900,
       formStatus: "Active",
     },
-  ];
+  ]);
+
+  // 3. Función para obtener los conteos de Supabase
+  const fetchFormAnswers = async () => {
+    try {
+      const updatedForms = await Promise.all(
+        forms.map(async (form) => {
+          // Consultamos la tabla donde se guardan las respuestas
+          // .select('*', { count: 'exact', head: true }) es muy eficiente para solo traer el número
+          const { count, error } = await supabase
+            .from("temp_registros") // <--- REEMPLAZA CON EL NOMBRE REAL DE TU TABLA
+            .select("*", { count: "exact", head: true })
+            .eq("ivercapacita", form.formId);
+
+          if (error) {
+            console.error(`Error fetching count for ${form.formId}:`, error);
+            return form;
+          }
+
+          return { ...form, formAnswers: count || 0 };
+        }),
+      );
+      setForms(updatedForms);
+    } catch (error) {
+      console.error("Error general al obtener respuestas:", error);
+    }
+  };
+
+  useEffect(() => {
+    initFlowbite();
+    fetchFormAnswers(); // Ejecutar al cargar el componente
+  }, []);
 
   const handleNavigate = (formId: string) => {
     // ✅ Navega a la ruta dinámicamente usando el router
@@ -367,7 +397,7 @@ export default function FormsPageDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {formsData.map((frm) => {
+                {forms.map((frm) => {
                   return (
                     <tr
                       key={frm.formId}
