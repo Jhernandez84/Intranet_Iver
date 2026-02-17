@@ -33,7 +33,8 @@ const FinanceBarChart = ({
   const chartRef = useRef<ApexCharts | null>(null);
   const chartElRef = useRef<HTMLDivElement | null>(null);
 
-  const { financeMovements, isLoadingFinanceData } = useFinanceData();
+  const { filters, setFilters, financeMovements, isLoadingFinanceData } =
+    useFinanceData();
   const safeData = financeMovements ?? [];
 
   const [dateRange, setDateRange] = useState<DateRangeKey>("MTD");
@@ -41,8 +42,8 @@ const FinanceBarChart = ({
   const { fechaDesde, fechaHasta } = getDateRange(dateRange);
 
   const { series, categories } = groupByMesTipoForChartPretty(safeData, {
-    fechaDesde: new Date(fechaDesde),
-    fechaHasta: new Date(fechaHasta),
+    fechaDesde: new Date(filters.fromDate),
+    fechaHasta: new Date(filters.toDate),
   });
 
   const Balance = getTotalsByTipo(safeData, { fechaDesde, fechaHasta });
@@ -146,7 +147,8 @@ const FinanceBarChart = ({
       <div className="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
         <dl>
           <dt className="pb-1 text-base font-normal text-gray-500 dark:text-gray-400">
-            Balance {dateRange}
+            {/* Balance {dateRange} */}
+            Balance {filters.fromDate} - {filters.toDate}
           </dt>
           <dd className="text-3xl leading-none font-bold text-gray-900 dark:text-white">
             {formatCurrency(Balance.total)}
@@ -184,7 +186,7 @@ const FinanceBarChart = ({
 
       <div className="grid grid-cols-2 items-center justify-between border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between pt-5">
-          <FinanceFiltersComponent />
+          {/* <FinanceFiltersComponent /> */}
           {/* <Dropdown
             label=""
             dismissOnClick={true}

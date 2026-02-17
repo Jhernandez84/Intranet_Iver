@@ -39,8 +39,8 @@ export const ReportButton = ({ movimientos }: ReportButtonProps) => {
       style={{ textDecoration: "none" }}
     >
       {({ loading }) => (
-        <span className="inline-block cursor-pointer gap-2 rounded bg-gray-600 px-2 py-1 text-xs text-white hover:bg-gray-700">
-          {loading ? "Generando..." : "🖨️ Detalle PDF"}
+        <span className="inline-block cursor-pointer gap-2 rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700">
+          {loading ? "Generando..." : "🖨️ Movimientos"}
         </span>
       )}
     </PDFDownloadLink>

@@ -165,18 +165,17 @@ export default function DashboardFinance() {
             <CardComponent
               label="Balance de esta semana"
               period="WTD"
-              actionButton={ActionButton}
+              // actionButton={ActionButton}
             />
             <CardComponent
               label="Balance del mes"
               period="MTD"
-              // actionButton={ActionButtonRefresh}
+              actionButton={ActionButtonToPdf}
               actionButton2={ActionButtonToPdf2} // <--- Inyectamos el nuevo botón aquí
               // actionButton3={ActionButtonToPdf2} // <--- Inyectamos el nuevo botón aquí
             />
           </div>
         </div>
-        <div>{/* <FinanceFiltersComponent /> */}</div>
         <div className="h-full w-full overflow-hidden">
           <MovementsTable
             data={financeMovements}

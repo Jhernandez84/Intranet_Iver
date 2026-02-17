@@ -36,6 +36,7 @@ export interface FinanceFilters {
   tipo_mov?: string | null;
   metodo_pago?: string | null;
   observaciones: string;
+  sede_id: string | null;
   sortConfig: { key: string; direction: "asc" | "desc" | null };
   [key: string]: unknown;
 }
@@ -78,6 +79,7 @@ export const CompanyFinanceProvider = ({
     tipo_mov: null,
     metodo_pago: null,
     observaciones: "",
+    sede_id: null,
     sortConfig: { key: "fecha", direction: "desc" },
   });
 
@@ -116,7 +118,9 @@ export const CompanyFinanceProvider = ({
         !filters.metodo_pago || mov.metodo_pago === filters.metodo_pago;
       const matchTipoMov =
         !filters.tipo_mov || mov.tipo_mov === filters.tipo_mov;
-      return matchTipo && matchMetodo && matchTipoMov;
+      const matchSede =
+        !filters.sede_id || String(mov.sede_id) === String(filters.sede_id);
+      return matchTipo && matchMetodo && matchTipoMov && matchSede;
     });
 
     const { key, direction } = filters.sortConfig;

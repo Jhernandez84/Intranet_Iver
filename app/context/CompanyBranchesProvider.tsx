@@ -19,7 +19,7 @@ interface BranchesAccess {
 [];
 
 // 2. Crea el contexto
-const CompanyBranchesContext = createContext<BranchesAccess[] | null>(null);
+const CompanyBranchesContext = createContext<BranchesAccess[] | null>([]);
 
 // 3. Crea el hook personalizado para acceder al contexto
 export const useCompanyBranchesAccess = () => {

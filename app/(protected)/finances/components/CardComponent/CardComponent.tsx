@@ -30,7 +30,8 @@ export default function CardComponent({
     initFlowbite();
   }, []);
 
-  const { financeMovements, isLoadingFinanceData } = useFinanceData();
+  const { filters, setFilters, financeMovements, isLoadingFinanceData } =
+    useFinanceData();
 
   const safeData = financeMovements ?? [];
 
@@ -53,20 +54,25 @@ export default function CardComponent({
             </dd>
           </dl>
           <div>
-            {actionButton && actionButton2 && (
-              <div className="grid grid-cols-2 gap-2">
-                <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700">
-                  {actionButton}
-                </div>
+            {/* Renderiza el contenedor si existe el botón 1 O el botón 2 */}
+            {actionButton || actionButton2 ? (
+              <div
+                className={`grid gap-2 ${actionButton && actionButton2 ? "grid-cols-2" : "grid-cols-1"}`}
+              >
+                {actionButton && (
+                  <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-center text-xs text-white hover:bg-blue-700">
+                    {actionButton}
+                  </div>
+                )}
 
-                <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700">
-                  {actionButton2}
-                </div>
+                {actionButton2 && (
+                  <div className="cursor-pointer rounded bg-blue-600 px-2 py-1 text-center text-xs text-white hover:bg-blue-700">
+                    {actionButton2}
+                  </div>
+                )}
               </div>
-            )}
-
-            {/* 👉 renderiza el botón */}
-            {!actionButton && (
+            ) : (
+              /* Si no hay NINGÚN botón, renderiza el badge de Profit Rate */
               <span className="inline-flex items-center rounded-md bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
                 <svg
                   className="me-1.5 h-2.5 w-2.5"
@@ -77,9 +83,9 @@ export default function CardComponent({
                 >
                   <path
                     stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M5 13V1m0 0L1 5m4-4 4 4"
                   />
                 </svg>
