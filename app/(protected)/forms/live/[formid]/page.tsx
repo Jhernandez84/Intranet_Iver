@@ -154,7 +154,7 @@ export default function DynamicFormPage({ params }: PageProps) {
     <div className="flex min-h-[90%] items-center justify-center p-4 font-sans text-slate-900">
       <div
         className="relative inset-0 flex min-h-[420px] w-full max-w-2xl flex-col overflow-hidden rounded-[2.5rem] border border-white bg-white bg-cover bg-center bg-no-repeat shadow-2xl md:aspect-[1.8/1]"
-        style={{ backgroundImage: "url('/Imagen.jpeg')" }}
+        style={{ backgroundImage: "url('/imagen.jpeg')" }}
       >
         {currentStep >= 0 && (
           <div className="absolute top-0 left-0 h-2 w-full bg-slate-100">
