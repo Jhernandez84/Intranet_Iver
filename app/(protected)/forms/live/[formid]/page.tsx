@@ -1,13 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useParams, useSearchParams } from "next/navigation";
+import { useState, useEffect, use } from "react"; // Importamos 'use'
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import Image from "next/image";
-import Link from "next/link";
 import Swal from "sweetalert2";
 
+// 1. Interfaces estrictas
 interface FinanceEntryForm {
   rut: string;
   name: string;
@@ -16,135 +13,115 @@ interface FinanceEntryForm {
   phone: string;
   apoderado: string;
   contactoapoderado: string;
-  ivercapacita: string;
+  age: string;
+  event_name: string;
   ref_asignatura: string;
   ref_grupo: string;
-  ref_target: string[]; // ✅ Corrected type: array of strings
+  ref_target: string[];
+  [key: string]: string | string[];
 }
 
-export default function LiveFormsPage() {
+interface FormStep {
+  id: keyof FinanceEntryForm;
+  label: string;
+  type: "text" | "number" | "select";
+  placeholder?: string;
+  mandatory: boolean;
+  options?: string[];
+}
+
+// 2. Definición de Props compatible con Next.js 15 (Promise)
+interface PageProps {
+  params: Promise<{
+    formid: string;
+  }>;
+}
+
+export default function DynamicFormPage({ params }: PageProps) {
+  // Desatamos la promesa de params usando el hook 'use'
+  const { formid } = use(params);
+
   const supabase = createClientComponentClient();
+  const [currentStep, setCurrentStep] = useState<number>(-1);
+  const [isSending, setIsSending] = useState<boolean>(false);
 
-  const router = useRouter();
-
-  const { formid } = useParams<{ formid: string }>();
-  const search = useSearchParams();
-  const program = search.get("program") ?? "";
-
-  const [showModal, setShowModal] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-
-  const [sendind, setIsSending] = useState(false);
-  const [insertError, setSaveError] = useState<string | null>(null);
-
-  const handleShowConfirm = () => {
-    Swal.fire({
-      title: "Muchas gracias por inscribirse",
-      text: "Pronto le contactarán para una breve entrevista",
-      icon: "success",
-    });
-
-    // setShowModal(true);
-
-    // setTimeout(() => {
-    //   setShowModal(false);
-    //   // router.push(`/forms/workspace/PostulaIverKids`);
-    // }, 2000);
-  };
-
-  const handleShowAlert = () => {
-    setShowAlert(true);
-    setTimeout(() => {
-      setShowAlert(false);
-    }, 5000);
-  };
-
-  const [form, setForm] = useState<FinanceEntryForm>({
+  const [formData, setFormData] = useState<FinanceEntryForm>({
     rut: "",
     name: "",
     last_name: "",
     second_last_name: "",
     phone: "",
-    ivercapacita: formid,
-    contactoapoderado: "",
     apoderado: "",
+    contactoapoderado: "",
+    age: "",
+    event_name: formid,
     ref_asignatura: "",
     ref_grupo: "",
-    ref_target: [], // ✅ Initial state with an empty array
+    ref_target: [],
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-
-    setForm((prevForm) => {
-      if (checked) {
-        // ✅ Add the value to the ref_target array
-        return {
-          ...prevForm,
-          ref_target: [...prevForm.ref_target, value],
-        };
-      } else {
-        // ✅ Remove the value from the ref_target array
-        return {
-          ...prevForm,
-          ref_target: prevForm.ref_target.filter((item) => item !== value),
-        };
-      }
-    });
-  };
-
+  // Sincronizar ivercapacita si el formid cambia
   useEffect(() => {
-    console.log("Form ID:", formid, "Program:", program);
-  }, [formid, program]);
+    setFormData((prev) => ({ ...prev, event_name: formid }));
+  }, [formid]);
+
+  const formSteps: FormStep[] = [
+    {
+      id: "rut",
+      label: "RUT",
+      type: "text",
+      placeholder: "12.345.678-9",
+      mandatory: true,
+    },
+    {
+      id: "name",
+      label: "Nombre",
+      type: "text",
+      placeholder: "Ej: Juan",
+      mandatory: true,
+    },
+    {
+      id: "last_name",
+      label: "Apellidos",
+      type: "text",
+      placeholder: "Ej: Pérez Soto",
+      mandatory: true,
+    },
+    {
+      id: "phone",
+      label: "Teléfono",
+      type: "text",
+      placeholder: "912345678",
+      mandatory: true,
+    },
+    {
+      id: "age",
+      label: "Edad",
+      type: "text",
+      placeholder: "30",
+      mandatory: false,
+    },
+  ];
+
+  const handleChange = (id: keyof FinanceEntryForm, value: string) => {
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
   const handleSubmit = async () => {
-    console.log("guardando");
     setIsSending(true);
-    setSaveError(null);
-
     const { error: insertError } = await supabase
       .from("temp_registros")
-      .insert([
-        {
-          ...form,
-          // Convert array to string for Supabase TEXT column if needed
-          // ref_target: form.ref_target.join(','),
-        },
-      ]);
+      .insert([{ ...formData, event_name: formid }]);
+
+    setIsSending(false);
 
     if (insertError) {
-      console.error(
-        "Error al guardar movimiento financiero:",
-        insertError.message,
-      );
-      setSaveError(insertError.message);
-      handleShowAlert();
-      setForm({
-        rut: "",
-        name: "",
-        last_name: "",
-        second_last_name: "",
-        phone: "",
-        apoderado: "",
-        contactoapoderado: "",
-        ivercapacita: formid,
-        ref_asignatura: "",
-        ref_grupo: "",
-        ref_target: [], // ✅ Reset the form correctly
-      });
+      Swal.fire("Error", insertError.message, "error");
       return;
-    } else {
-      console.log("Registro guardado exitosamente");
-      setForm({
+    }
+
+    Swal.fire("¡Éxito!", "Registro guardado", "success").then(() => {
+      setFormData({
         rut: "",
         name: "",
         last_name: "",
@@ -152,264 +129,114 @@ export default function LiveFormsPage() {
         phone: "",
         apoderado: "",
         contactoapoderado: "",
-        ivercapacita: formid,
+        age: "",
+        event_name: formid,
         ref_asignatura: "",
         ref_grupo: "",
         ref_target: [],
       });
-    }
-
-    setIsSending(false);
-    handleShowConfirm();
+      setCurrentStep(-1);
+    });
   };
 
-  // ... (JSX for the form remains largely the same)
+  const currentField = formSteps[currentStep];
+  const isNextDisabled =
+    currentStep >= 0 &&
+    formSteps[currentStep].mandatory &&
+    !formData[formSteps[currentStep].id];
+
   return (
-    <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
-      <div className="pb-2 text-center text-xl text-white">
-        <h1>{formid}</h1>
-      </div>
-
-      <Image
-        src="/LogoIverKids.jpeg"
-        alt="LogoIverKids"
-        width={140}
-        height={0}
-        quality={100}
-        className="mx-auto mb-2 mb-4 block rounded-lg object-cover"
-      />
-
-      <div className="text-md pb-4 text-center text-white">
-        <p>
-          Si deseas ser parte del equipo Iverkids y preparar a los nuevos
-          embajadores del reino de los cielos, te invitamos a completar los
-          datos del formulario
-        </p>
-      </div>
-      <form className="sm:align-center pr-10 pl-10">
-        <div className="mb-6 grid gap-4">
-          <div>
-            <label
-              htmlFor="rut"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Rut
-            </label>
-
-            <input
-              type="text"
-              id="rut"
-              name="rut"
-              maxLength={8}
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="12345678"
-              value={form.rut}
-              onChange={handleChange}
-              required
-              autoComplete="off"
+    <div className="flex min-h-[90%] items-center justify-center p-4 font-sans text-slate-900">
+      <div className="relative flex min-h-[420px] w-full max-w-2xl flex-col overflow-hidden rounded-[2.5rem] border border-white bg-white shadow-2xl md:aspect-[1.8/1]">
+        {currentStep >= 0 && (
+          <div className="absolute top-0 left-0 h-2 w-full bg-slate-100">
+            <div
+              className="h-full bg-blue-600 transition-all duration-700 ease-in-out"
+              style={{
+                width: `${((currentStep + 1) / formSteps.length) * 100}%`,
+              }}
             />
           </div>
+        )}
 
-          <div>
-            <label
-              htmlFor="name"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Nombres
-            </label>
+        <div className="flex flex-1 flex-col p-8 md:p-12">
+          {currentStep === -1 ? (
+            <div className="flex flex-1 flex-col items-center justify-center text-center">
+              <h1 className="text-4xl font-black tracking-tight text-slate-800">
+                Bienvenido
+              </h1>
+              <p className="mt-4 text-lg text-slate-500">
+                Inicia tu registro para el formulario{" "}
+                <span className="font-mono font-bold text-blue-600">
+                  {formid}
+                </span>
+              </p>
+              <button
+                onClick={() => setCurrentStep(0)}
+                className="mt-8 w-full max-w-xs rounded-2xl bg-blue-600 py-4 font-bold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
+              >
+                Comenzar Registro
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-1 flex-col justify-center">
+                <span className="mb-2 text-xs font-black tracking-widest text-blue-500 uppercase">
+                  Paso {currentStep + 1} de {formSteps.length}
+                </span>
+                <label className="mb-6 block text-3xl leading-tight font-bold text-slate-800">
+                  {currentField.label}
+                  {currentField.mandatory && (
+                    <span className="ml-2 text-blue-500">*</span>
+                  )}
+                </label>
 
-            <input
-              type="text"
-              id="name"
-              name="name"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="John"
-              value={form.name}
-              onChange={handleChange}
-              required
-              autoComplete="given-name"
-            />
-          </div>
+                <input
+                  key={currentField.id}
+                  autoFocus
+                  type={currentField.type}
+                  placeholder={currentField.placeholder}
+                  value={formData[currentField.id] as string}
+                  onChange={(e) =>
+                    handleChange(currentField.id, e.target.value)
+                  }
+                  className="w-full rounded-2xl border-2 border-slate-100 bg-slate-50 p-6 text-xl shadow-sm transition-all outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
 
-          <div>
-            <label
-              htmlFor="last_name"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Apellido Paterno
-            </label>
-
-            <input
-              type="text"
-              id="last_name"
-              name="last_name"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Apellido Paterno"
-              value={form.last_name}
-              onChange={handleChange}
-              required
-              autoComplete="family-name"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="second_last_name"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Apellido Materno
-            </label>
-
-            <input
-              type="text"
-              id="second_last_name"
-              name="second_last_name"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Apellido Materno"
-              value={form.second_last_name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="phone"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Teléfono
-            </label>
-
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="999999999"
-              value={form.phone}
-              onChange={handleChange}
-              required
-              // Si quieres validar formato chileno, podrías usar un pattern:
-              // pattern="^\d{9}$"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="ref_asignatura"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              ¿Actualmente hace clases en algún establecimiento eduacional?
-            </label>
-            <select
-              id="ref_asignatura"
-              name="ref_asignatura"
-              value={form.ref_asignatura}
-              onChange={handleChange}
-              className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              required
-            >
-              <option value="NO">No</option>
-              <option value="SI">Si</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="ref_grupo"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              ¿Ha participado antes en escuelas para niños en alguna iglesia?
-            </label>
-
-            <select
-              id="ref_grupo"
-              name="ref_grupo"
-              value={form.ref_grupo}
-              onChange={handleChange}
-              className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              required
-            >
-              <option value="NO">No</option>
-              <option value="SI">Si</option>
-            </select>
-          </div>
-        </div>
-
-        {/* ... (Buttons) ... */}
-        {form.rut &&
-          form.name &&
-          form.last_name &&
-          form.second_last_name &&
-          form.phone && (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-            >
-              Enviar ✅
-            </button>
+              <div className="mt-10 flex items-center justify-between gap-6">
+                <button
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                  className="text-sm font-bold tracking-widest text-slate-400 uppercase hover:text-slate-600"
+                >
+                  Atrás
+                </button>
+                <button
+                  disabled={isSending || isNextDisabled}
+                  onClick={() => {
+                    if (currentStep < formSteps.length - 1) {
+                      setCurrentStep(currentStep + 1);
+                    } else {
+                      handleSubmit();
+                    }
+                  }}
+                  className={`flex-1 rounded-2xl py-4 text-lg font-bold text-white shadow-xl transition-all active:scale-95 ${
+                    isSending || isNextDisabled
+                      ? "cursor-not-allowed bg-slate-200 text-slate-400 shadow-none"
+                      : "bg-blue-600 shadow-blue-100 hover:bg-blue-700"
+                  }`}
+                >
+                  {isSending
+                    ? "Guardando..."
+                    : currentStep === formSteps.length - 1
+                      ? "Finalizar"
+                      : "Siguiente"}
+                </button>
+              </div>
+            </>
           )}
-
-        <Link href={`/forms/workspace/IverCapacita`}>
-          <button
-            type="button"
-            className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-600"
-          >
-            Regresar ⬅️
-          </button>
-        </Link>
-      </form>
-
-      {showModal && (
-        <div
-          id="toast-success"
-          className="fixed top-4 right-4 z-50 mb-4 flex w-full max-w-xs items-center rounded-lg bg-white p-4 text-gray-700 shadow-lg dark:bg-gray-800 dark:text-gray-200"
-          role="status"
-          aria-live="polite"
-        >
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200">
-            <svg
-              className="h-5 w-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-            </svg>
-
-            <span className="sr-only">Felicidades</span>
-          </div>
-
-          <div className="ms-3 text-sm font-medium">
-            Felicidades!! has quedado inscrito para {form.ivercapacita} !!
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowModal(false)}
-            className="-mx-1.5 -my-1.5 ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 focus:ring-2 focus:ring-gray-300 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white"
-            aria-label="Cerrar"
-          >
-            <svg
-              className="h-3 w-3"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 14 14"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-              />
-            </svg>
-          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }

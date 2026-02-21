@@ -13,7 +13,7 @@ export const FinanceFiltersComponent = () => {
   const branches = useCompanyBranchesAccess();
 
   // Estado local para manejar el valor del selector de periodo
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>("WTD");
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>("MTD");
 
   const getDateRange = (period: PeriodType) => {
     const now = new Date();
