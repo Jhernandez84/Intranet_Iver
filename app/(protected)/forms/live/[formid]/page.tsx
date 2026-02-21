@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react"; // Importamos 'use'
+import Image from "next/image";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Swal from "sweetalert2";
 
@@ -161,22 +162,31 @@ export default function DynamicFormPage({ params }: PageProps) {
 
         <div className="flex flex-1 flex-col p-8 md:p-12">
           {currentStep === -1 ? (
-            <div className="flex flex-1 flex-col items-center justify-center text-center">
-              <h1 className="text-4xl font-black tracking-tight text-slate-800">
-                Bienvenido
-              </h1>
-              <p className="mt-4 text-lg text-slate-500">
-                Inicia tu registro para el formulario{" "}
-                <span className="font-mono font-bold text-blue-600">
-                  {formid}
-                </span>
-              </p>
-              <button
-                onClick={() => setCurrentStep(0)}
-                className="mt-8 w-full max-w-xs rounded-2xl bg-blue-600 py-4 font-bold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
-              >
-                Comenzar Registro
-              </button>
+            <div
+              className="relative flex flex-1 flex-col items-center justify-center bg-cover bg-center bg-no-repeat text-center"
+              style={{ backgroundImage: "url('public/ImagenAviva.jpeg')" }} // Ruta de tu imagen
+            >
+              {/* Overlay opcional para que el texto sea legible */}
+              <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+
+              {/* Contenido (necesita relative para estar sobre el overlay) */}
+              <div className="relative z-10 p-4">
+                <h1 className="text-4xl font-black tracking-tight text-slate-800">
+                  Bienvenido
+                </h1>
+                <p className="mt-4 text-lg text-slate-500">
+                  Inicia tu registro para el formulario{" "}
+                  <span className="font-mono font-bold text-blue-600">
+                    {formid}
+                  </span>
+                </p>
+                <button
+                  onClick={() => setCurrentStep(0)}
+                  className="mt-8 w-full max-w-xs rounded-2xl bg-pink-500 py-4 font-bold text-white shadow-lg shadow-pink-200 transition-all hover:bg-pink-700 active:scale-95"
+                >
+                  Comenzar Registro
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -223,7 +233,7 @@ export default function DynamicFormPage({ params }: PageProps) {
                   className={`flex-1 rounded-2xl py-4 text-lg font-bold text-white shadow-xl transition-all active:scale-95 ${
                     isSending || isNextDisabled
                       ? "cursor-not-allowed bg-slate-200 text-slate-400 shadow-none"
-                      : "bg-blue-600 shadow-blue-100 hover:bg-blue-700"
+                      : "bg-pink-500 shadow-blue-100 hover:bg-pink-700"
                   }`}
                 >
                   {isSending
