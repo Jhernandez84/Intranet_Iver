@@ -30,8 +30,8 @@ export default function FormsPageDashboard() {
       try {
         const { data: responses, error } = await supabase
           .from("temp_registros")
-          .select("name,last_name,phone,contactoapoderado")
-          .eq("ivercapacita", formId);
+          .select("name,last_name,phone,age")
+          .eq("event_name", formId);
 
         if (error) throw error;
         // Casteamos el resultado al tipo definido
@@ -52,7 +52,7 @@ export default function FormsPageDashboard() {
         <header className="mb-6 px-2">
           <h1 className="text-2xl font-bold text-gray-800">
             Resultados:{" "}
-            <span className="font-mono text-blue-600">{formId}</span> -
+            <span className="font-mono text-blue-600">{formId}</span> |{" "}
             {data.length} Inscritos
           </h1>
         </header>

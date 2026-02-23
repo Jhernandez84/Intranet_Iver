@@ -13,14 +13,14 @@ export default function FormsPageDashboard() {
   const router = useRouter();
   const [forms, setForms] = useState([
     {
-      formId: "LyR_aviva",
-      formName: "LyR_aviva",
+      formId: "mujeresconproposito",
+      formName: "mujeresconproposito",
       formCategory: "Formulario",
       formWorkSpace: "No",
-      formCreatedAt: "10-01-2026",
+      formCreatedAt: "07-03-2026",
       formAnswers: 25,
       formLimitAnswers: 900,
-      formStatus: "Inactive",
+      formStatus: "Active",
     },
     {
       formId: "SeminarioDanzaIverChile",
@@ -64,7 +64,7 @@ export default function FormsPageDashboard() {
           const { count, error } = await supabase
             .from("temp_registros") // <--- REEMPLAZA CON EL NOMBRE REAL DE TU TABLA
             .select("*", { count: "exact", head: true })
-            .eq("ivercapacita", form.formId);
+            .eq("event_name", form.formId);
 
           if (error) {
             console.error(`Error fetching count for ${form.formId}:`, error);
@@ -98,7 +98,8 @@ export default function FormsPageDashboard() {
 
   const handleEditForm = (formid: string) => {
     // ✅ Navega a la ruta dinámicamente usando el router
-    router.push(`/forms/build/${formid}`);
+    // router.push(`/forms/build/${formid}`);
+    router.push(`/forms/build`);
   };
 
   const handleTableViewer = (formid: string) => {
