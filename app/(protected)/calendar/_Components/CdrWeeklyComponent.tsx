@@ -1,7 +1,7 @@
 "use client";
 import { Datepicker } from "flowbite-react";
 import { useState } from "react";
-import { Week } from "react-day-picker";
+import Image from "next/image";
 
 export default function CdrWeeklyComponent() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -53,10 +53,11 @@ export default function CdrWeeklyComponent() {
               <li className="py-3 sm:py-4">
                 <div className="flex items-center">
                   <div className="shrink-0">
-                    <img
-                      className="h-8 w-8 rounded-full"
+                    <Image
                       src="/docs/images/people/profile-picture-1.jpg"
-                      alt="Neil image"
+                      width={500}
+                      height={500}
+                      alt="Picture of the author"
                     />
                   </div>
                   <div className="ms-4 min-w-0 flex-1">

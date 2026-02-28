@@ -36,6 +36,7 @@ export default function CdrYearlyComponent() {
     <section className="grid grid-cols-4 gap-4">
       {months.map((month, i) => (
         <div key={month} className="rounded-lg bg-gray-800 p-2">
+          <h1>{selectedDates[i].getDay()}</h1>
           {/* <h2 className="mb-2 text-center font-bold text-white">{month}</h2> */}
           <Datepicker
             name={`fecha-${i}`}
