@@ -13,8 +13,10 @@ import { useUser } from "../../../../context/UserProvider";
 
 // Definimos la interfaz para el estado
 interface SyncStatus {
+  id: "BANK" | "TUU" | "GETNET";
   label: string;
   lastDate: string | null;
+  rec_status: string | null;
   reconciledDate: string | null;
 }
 
@@ -28,6 +30,7 @@ export default function TabComponent() {
   const [dates, setDates] = useState({ start: "", end: "" });
   const [isProcessing, setIsProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isSyncingRow, setIsSyncingRow] = useState<string | null>(null);
 
   // Estado para los datos de la tabla de sincronización
   const [syncRows, setSyncRows] = useState<SyncStatus[]>([]);
@@ -40,18 +43,32 @@ export default function TabComponent() {
 
       setSyncRows([
         {
+          id: "BANK",
           label: "Movimientos Bancarios",
           lastDate: status.last_bank_movement,
+          rec_status: status.is_fully_reconciled
+            ? "Todo al día"
+            : "Pendientes detectados",
           reconciledDate: status.last_reconciled_date.bank,
         },
         {
+          id: "TUU",
           label: "Transacciones TUU",
           lastDate: status.last_tuu_sync,
+          rec_status: status.is_fully_reconciled
+            ? "Todo al día"
+            : "Pendientes detectados",
+
           reconciledDate: status.last_reconciled_date.gateway,
         },
         {
+          id: "GETNET",
           label: "Transacciones GETNET",
           lastDate: status.last_getnet_sync,
+          rec_status: status.is_fully_reconciled
+            ? "Todo al día"
+            : "Pendientes detectados",
+
           reconciledDate: status.last_reconciled_date.gateway,
         },
       ]);
@@ -132,6 +149,42 @@ export default function TabComponent() {
     },
   ];
 
+  const handleRowSync = async (row: SyncStatus) => {
+    const companyId = user?.company_id || "1";
+    setIsSyncingRow(row.id);
+
+    try {
+      if (row.id === "TUU") {
+        // Ejemplo: Sincronizar desde la última fecha + 1 día hasta hoy
+        const startDate = row.lastDate
+          ? new Date(new Date(row.lastDate).getTime() + 86400000)
+              .toISOString()
+              .split("T")[0]
+          : "2026-01-01";
+        const endDate = new Date().toISOString().split("T")[0];
+
+        await syncTuuDataAction(companyId, startDate, endDate);
+        alert("Sincronización de TUU completada");
+      } else if (row.id === "BANK") {
+        alert(
+          "Para movimientos bancarios, por favor usa la pestaña de Carga Masiva",
+        );
+      } else if (row.id === "GETNET") {
+        alert(
+          "Sincronización automática de Getnet no disponible (Requiere Excel)",
+        );
+      }
+
+      // Refrescar los datos de la tabla después de sincronizar
+      const status = await getSyncStatus(companyId);
+      // ... (repetir lógica de setSyncRows para actualizar la vista)
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSyncingRow(null);
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case "Movimientos":
@@ -140,16 +193,19 @@ export default function TabComponent() {
             <table className="min-w-full divide-y divide-gray-200 bg-white text-sm">
               <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase">
                 <tr>
-                  <th className="px-6 py-3 text-start">Origen de Datos</th>
-                  <th className="px-6 py-3 text-start">Último Registro</th>
-                  <th className="px-6 py-3 text-start">Última Conciliación</th>
-                  <th className="px-6 py-3 text-start">Estado</th>
+                  <th className="px-6 py-3">Origen de Datos</th>
+                  <th className="px-6 py-3">Último Registro</th>
+                  <th className="px-6 py-3">Última Conciliación</th>
+                  <th className="px-6 py-3">Estado Conciliación</th>
+                  <th className="px-6 py-3">Estado</th>
+                  <th className="px-6 py-3 text-center">Acción</th>{" "}
+                  {/* Nueva Columna */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {syncRows.map((row) => (
                   <tr
-                    key={row.label}
+                    key={row.id}
                     className="transition-colors hover:bg-gray-50"
                   >
                     <td className="px-6 py-4 font-medium whitespace-nowrap text-gray-900">
@@ -167,16 +223,82 @@ export default function TabComponent() {
                           )
                         : "Pendiente"}
                     </td>
+                    <td className="px-6 py-4 font-medium whitespace-nowrap text-gray-900">
+                      {row.rec_status}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          row.lastDate
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                      {(() => {
+                        if (!row.lastDate) {
+                          return (
+                            <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                              Requiere Carga
+                            </span>
+                          );
+                        }
+
+                        // Obtenemos la fecha de "Ayer" (Hoy - 1 día)
+                        const today = new Date();
+                        const yesterday = new Date();
+                        yesterday.setDate(today.getDate() - 1);
+                        yesterday.setHours(0, 0, 0, 0); // Limpiamos horas para comparar solo días
+
+                        const lastDateObj = new Date(row.lastDate);
+                        lastDateObj.setHours(0, 0, 0, 0);
+
+                        // Es "Actualizado" si la fecha es igual o posterior a ayer
+                        const isUpToDate =
+                          lastDateObj.getTime() >= yesterday.getTime();
+
+                        return (
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              isUpToDate
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {isUpToDate ? "Actualizado" : "Requiere Actualizar"}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td className="px-6 py-4 text-center whitespace-nowrap">
+                      <button
+                        onClick={() => handleRowSync(row)}
+                        disabled={isSyncingRow !== null}
+                        className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
+                          row.id === "BANK"
+                            ? "cursor-not-allowed bg-gray-100 text-gray-400" // Deshabilitado para banco si es por Excel
+                            : "cursor-pointer bg-blue-600 text-white shadow-sm hover:bg-blue-700"
                         }`}
                       >
-                        {row.lastDate ? "Activo" : "Requiere Carga"}
-                      </span>
+                        {isSyncingRow === row.id ? (
+                          <span className="flex items-center gap-1">
+                            <svg
+                              className="h-3 w-3 animate-spin text-white"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                fill="none"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                            Sincronizando...
+                          </span>
+                        ) : (
+                          "Actualizar"
+                        )}
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -231,7 +353,18 @@ export default function TabComponent() {
 
       case "Carga Masiva":
         return (
-          <div className="mx-auto max-w-xl py-10">
+          <div className="mx-auto max-w-2xl">
+            <header className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-white">
+                Carga de Documentos
+              </h2>
+              <p className="text-sm text-gray-500">
+                Sube tus archivos Excel para procesar la información bancaria y
+                de POS.
+              </p>
+            </header>
+
+            {/* Solo pasamos el ID necesario */}
             <ExcelUploader companyId={user?.company_id || "1"} />
           </div>
         );
@@ -239,12 +372,7 @@ export default function TabComponent() {
       case "Ajustes":
         return (
           <div className="rounded-lg border bg-gray-50 p-10">
-            <button
-              onClick={handleSyncTuu}
-              className="rounded-lg bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
-            >
-              {loading ? "Sincronizando..." : "Sincronizar con Tuu.cl"}
-            </button>
+            <p>Proximamente</p>
           </div>
         );
 
