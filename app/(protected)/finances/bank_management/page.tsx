@@ -1,198 +1,246 @@
 "use client";
 
-import React, { useState } from "react";
-import * as XLSX from "xlsx";
-import { fastUploadGetnet, uploadBankMovements } from "./actions";
+import { useState } from "react";
+import { getMonthlyReportRPC, getOperationalReportRPC } from "./reports";
 import { useUser } from "../../../context/UserProvider";
 
-// --- Interfaces para Tipado Estricto ---
-interface GetnetExcelRow {
-  TERMINAL: string | number;
-  "ID TRANSACCIÓN": string | number;
-  "VALOR VENTA": number;
-  COMISIÓN: number;
-  "MONTO ABONO": number;
-  "FECHA VENTA": string | Date;
-  CUOTAS: number;
-  MARCA: string;
+// --- INTERFACES PARA ESLINT (NO ANY) ---
+
+interface MonthlyReportRow {
+  sede: string;
+  categoria: string;
+  total: number;
+  count: number;
 }
 
-interface BankExcelRow {
-  MONTO: number;
-  "[DESCRIPCIÓN MOVIMIENTO]": string;
-  "DESCRIPCIÓN MOVIMIENTO"?: string;
-  FECHA: string | Date;
-  SALDO: number;
-  "[N° DOCUMENTO]": string | number;
-  "N° DOCUMENTO"?: string | number;
-  SUCURSAL: string;
-  "CARGO/ABONO": string;
+interface MonthlyRPCRaw {
+  sede_nombre: string;
+  categoria: string;
+  total_monto: number;
+  cantidad_transacciones: number;
 }
 
-type UploadType = "GETNET" | "BANK";
+interface OperationalReportRow {
+  mes: string;
+  sede_nombre: string;
+  pasarela: string;
+  fuente: string;
+  venta_bruta_mensual: number;
+  comisiones_pagadas: number;
+  neto_a_recibir: number;
+}
 
-export default function BankManagementPage() {
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<{
-    message: string;
-    isError: boolean;
-  } | null>(null);
+export default function ReportPage() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+
+  // Estados tipados correctamente
+  const [data, setData] = useState<MonthlyReportRow[]>([]);
+  const [opData, setOpData] = useState<OperationalReportRow[]>([]);
 
   const { user } = useUser();
-  // ID de la empresa (Viene de tu Auth/Session Context)
-  const currentCompanyId = user?.company_id;
 
-  const processFile = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    type: UploadType,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleGenerateReport = async (): Promise<void> => {
+    if (!fromDate || !toDate || !user?.company_id) return;
 
     setLoading(true);
-    setStatus({ message: `Procesando archivo de ${type}...`, isError: false });
+    try {
+      // 1. Reporte de Recaudación (Banco)
+      const resBank: MonthlyRPCRaw[] = await getMonthlyReportRPC(
+        user.company_id,
+        fromDate,
+        toDate,
+      );
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const data = e.target?.result;
-        const workbook = XLSX.read(data, {
-          type: "array",
-          cellDates: false,
-          raw: true,
-        });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
+      const formattedBank: MonthlyReportRow[] = resBank.map((item) => ({
+        sede: item.sede_nombre,
+        categoria: item.categoria,
+        total: item.total_monto,
+        count: item.cantidad_transacciones,
+      }));
 
-        if (type === "GETNET") {
-          const jsonData = XLSX.utils.sheet_to_json<GetnetExcelRow>(worksheet);
-          const formattedRows = jsonData.map((row) => ({
-            terminal: String(row["TERMINAL"] || ""),
-            id_transaccion: String(row["ID TRANSACCIÓN"] || ""),
-            valor_venta: Number(row["VALOR VENTA"] || 0),
-            comision: Number(row["COMISIÓN"] || 0),
-            monto_abono: Number(row["MONTO ABONO"] || 0),
-            fecha_venta: row["FECHA VENTA"],
-            cuotas: Number(row["CUOTAS"] || 0),
-            marca: String(row["MARCA"] || "GENERICA"),
-          }));
+      setData(formattedBank);
 
-          const res = await fastUploadGetnet(currentCompanyId, formattedRows);
-          setStatus({
-            message: `Éxito: ${res.count} registros de Getnet cargados.`,
-            isError: false,
-          });
-        } else if (type === "BANK") {
-          const jsonData = XLSX.utils.sheet_to_json<BankExcelRow>(worksheet);
-          const formattedRows = jsonData.map((row) => ({
-            monto: Number(row["MONTO"] || 0),
-            descripcion: String(
-              row["[DESCRIPCIÓN MOVIMIENTO]"] ||
-                row["DESCRIPCIÓN MOVIMIENTO"] ||
-                "",
-            ),
-            fecha: row["FECHA"],
-            saldo: Number(row["SALDO"] || 0),
-            documento: String(
-              row["[N° DOCUMENTO]"] || row["N° DOCUMENTO"] || "",
-            ),
-            sucursal: String(row["SUCURSAL"] || ""),
-            tipo: String(row["CARGO/ABONO"] || ""),
-          }));
+      // 2. Reporte Operativo (Pasarelas)
+      const resOp: OperationalReportRow[] = await getOperationalReportRPC(
+        user.company_id,
+        fromDate,
+        toDate,
+      );
 
-          const res = await uploadBankMovements(
-            currentCompanyId,
-            formattedRows,
-          );
-          setStatus({
-            message: `Éxito: ${res.count} movimientos bancarios cargados.`,
-            isError: false,
-          });
-        }
-      } catch (err) {
-        console.error(err);
-        setStatus({
-          message:
-            "Error al procesar el archivo. Revisa el formato y las columnas.",
-          isError: true,
-        });
-      } finally {
-        setLoading(false);
-        // Limpiar el input para permitir cargar el mismo archivo si es necesario
-        event.target.value = "";
-      }
-    };
-
-    reader.readAsArrayBuffer(file);
+      setOpData(resOp);
+    } catch (error) {
+      console.error("Error al generar reportes:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const currencyFormatter = new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "CLP",
+  });
+
   return (
-    <div className="mx-auto max-w-4xl p-8">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Módulo de Conciliación Bancaria
+    <div className="mx-auto max-w-6xl p-8">
+      <header className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Panel de Reportes Financieros
         </h1>
-        <p className="text-gray-500">
-          Carga tus reportes de proveedores y cartolas bancarias.
-        </p>
+        <p className="text-sm text-gray-500">Empresa ID: {user?.company_id}</p>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Card Getnet */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-100">
-            <span className="font-bold text-orange-600">G</span>
-          </div>
-          <h2 className="mb-2 text-xl font-semibold">Reporte Getnet (POS)</h2>
-          <p className="mb-6 text-sm text-gray-500">
-            Detalle de ventas por terminal y comisiones.
-          </p>
-
+      {/* --- FILTROS --- */}
+      <div className="mb-8 flex flex-wrap items-end gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="min-w-[200px] flex-1">
+          <label className="mb-1 block text-xs font-medium tracking-wider text-gray-500 uppercase">
+            Fecha Inicio
+          </label>
           <input
-            type="file"
-            accept=".xlsx, .xls"
-            onChange={(e) => processFile(e, "GETNET")}
-            disabled={loading}
-            className="block w-full cursor-pointer text-xs text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-orange-700 hover:file:bg-orange-100"
+            type="date"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
           />
         </div>
-
-        {/* Card Banco */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-            <span className="font-bold text-blue-600">B</span>
-          </div>
-          <h2 className="mb-2 text-xl font-semibold">Cartola Bancaria</h2>
-          <p className="mb-6 text-sm text-gray-500">
-            Movimientos de la cuenta corriente (Totales).
-          </p>
-
+        <div className="min-w-[200px] flex-1">
+          <label className="mb-1 block text-xs font-medium tracking-wider text-gray-500 uppercase">
+            Fecha Fin
+          </label>
           <input
-            type="file"
-            accept=".xlsx, .xls"
-            onChange={(e) => processFile(e, "BANK")}
-            disabled={loading}
-            className="block w-full cursor-pointer text-xs text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+            type="date"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
           />
         </div>
+        <button
+          onClick={handleGenerateReport}
+          disabled={loading}
+          className="rounded-lg bg-blue-600 px-8 py-2 text-sm font-bold text-white transition-all hover:bg-blue-700 disabled:bg-gray-400"
+        >
+          {loading ? "Procesando..." : "Consultar Datos"}
+        </button>
       </div>
 
-      {/* Feedback Status */}
-      {status && (
-        <div
-          className={`mt-8 flex items-center rounded-lg p-4 ${status.isError ? "border border-red-200 bg-red-50 text-red-800" : "border border-green-200 bg-green-50 text-green-800"}`}
-        >
-          <span className="mr-2">{status.isError ? "⚠️" : "✅"}</span>
-          <p className="text-sm font-medium">{status.message}</p>
+      {/* --- RECAUDACIÓN REAL (BANCO) --- */}
+      <section className="mb-10">
+        <h2 className="mb-4 text-lg font-semibold text-gray-700">
+          Recaudación Real (Abonos en Banco)
+        </h2>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-gray-200 bg-gray-50">
+              <tr>
+                <th className="px-6 py-4 font-semibold">Sede</th>
+                <th className="px-6 py-4 font-semibold">Categoría</th>
+                <th className="px-6 py-4 text-center font-semibold">
+                  Transacciones
+                </th>
+                <th className="px-6 py-4 text-right font-semibold">
+                  Monto Neto
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {data.length > 0 ? (
+                data.map((item, idx) => (
+                  <tr key={`bank-${idx}`} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 font-medium text-gray-900">
+                      {item.sede}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                          item.categoria.includes("DIEZMO")
+                            ? "bg-green-100 text-green-700"
+                            : "bg-blue-100 text-blue-700"
+                        }`}
+                      >
+                        {item.categoria}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">{item.count}</td>
+                    <td className="px-6 py-4 text-right font-bold">
+                      {currencyFormatter.format(item.total)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="px-6 py-10 text-center text-gray-400"
+                  >
+                    Sin datos para el periodo
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+      </section>
 
-      {loading && (
-        <div className="mt-8 flex justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600">Procesando información...</span>
+      {/* --- VENTAS OPERATIVAS (PASARELAS) --- */}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold text-gray-700">
+          Ventas Operativas (Detalle de Pasarelas)
+        </h2>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b bg-gray-50">
+              <tr>
+                <th className="px-6 py-4">Mes / Sede</th>
+                <th className="px-6 py-4">Fuente / Pasarela</th>
+                <th className="px-6 py-4 text-right">Monto Bruto</th>
+                <th className="px-6 py-4 text-right">Comisiones</th>
+                <th className="px-6 py-4 text-right">Neto Esperado</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {opData.length > 0 ? (
+                opData.map((item, idx) => (
+                  <tr key={`op-${idx}`} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-gray-900">
+                        {item.sede_nombre}
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase">
+                        {new Date(item.mes).toLocaleDateString("es-CL", {
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-xs font-medium text-gray-600">
+                      {item.pasarela} — {item.fuente}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      {currencyFormatter.format(item.venta_bruta_mensual)}
+                    </td>
+                    <td className="px-6 py-4 text-right text-red-500">
+                      -{currencyFormatter.format(item.comisiones_pagadas)}
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-green-600">
+                      {currencyFormatter.format(item.neto_a_recibir)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-6 py-10 text-center text-gray-400"
+                  >
+                    Sin movimientos operativos
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+      </section>
     </div>
   );
 }
