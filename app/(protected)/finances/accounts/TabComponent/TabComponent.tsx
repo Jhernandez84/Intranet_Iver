@@ -8,6 +8,8 @@ import {
   getUnreconciledCount,
   syncTuuDataAction,
 } from "../../bank_management/actions";
+import SimpleDelete from "../../utils/TableManagement";
+
 import { getSyncStatus } from "../../helper/GetStatus";
 import { useUser } from "../../../../context/UserProvider";
 
@@ -141,6 +143,10 @@ export default function TabComponent() {
     },
     {
       name: "Carga Masiva",
+      icon: "M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-4-4 4m0 0-4-4m4 4V4",
+    },
+    {
+      name: "Eliminar",
       icon: "M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-4-4 4m0 0-4-4m4 4V4",
     },
     {
@@ -366,6 +372,23 @@ export default function TabComponent() {
 
             {/* Solo pasamos el ID necesario */}
             <ExcelUploader companyId={user?.company_id || "1"} />
+          </div>
+        );
+
+      case "Eliminar":
+        return (
+          <div className="mx-auto max-w-2xl">
+            <header className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-white">
+                Carga de Documentos
+              </h2>
+              <p className="text-sm text-gray-500">
+                Selecciona rango de fecha que deseas eliminar
+              </p>
+            </header>
+
+            {/* Solo pasamos el ID necesario */}
+            <SimpleDelete />
           </div>
         );
 

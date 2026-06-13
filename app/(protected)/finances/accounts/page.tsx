@@ -111,27 +111,8 @@ export default function ReconcilementPage() {
   );
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr] gap-4">
-      {/* 1. SECCIÓN DE CARDS SUPERIORES */}
-      <div>
-        <div className="grid h-full w-full grid-cols-1 gap-4 md:grid-cols-2">
-          <CardComponent
-            label={`Balance ${activeAccount.nombre}`}
-            period="WTD"
-            actionButton={ActionButton}
-          />
-          <CardComponent
-            label={`Balance del mes ${activeAccount.nombre}`}
-            period="MTD"
-            actionButton2={ActionButton} // Inyectamos el nuevo botón aquí
-          />
-        </div>
-      </div>
-
-      {/* 2. SELECTOR DE CUENTAS CORRIENTES */}
-      <div>
-        <TabComponent />
-      </div>
+    <div className="grid h-full grid-rows-[auto_1fr]">
+      <TabComponent />
     </div>
   );
 }

@@ -1,37 +1,35 @@
 "use client";
 
-import { useState, useEffect, use } from "react"; // Importamos 'use'
-import Image from "next/image";
+import { useState, useEffect, use } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Swal from "sweetalert2";
 
-// 1. Interfaces estrictas
-interface FinanceEntryForm {
-  rut: string;
-  name: string;
-  last_name: string;
-  second_last_name: string;
-  phone: string;
-  apoderado: string;
-  contactoapoderado: string;
-  age: string;
+// 1. Interfaz estricta actualizada
+interface MatrimonioForm {
+  ella_rut: string;
+  ella_name: string;
+  ella_last_name: string;
+  ella_phone: string;
+  ella_birth_date: string; // 👈 Cambiado de ella_age a ella_birth_date
+
+  el_rut: string;
+  el_name: string;
+  el_last_name: string;
+  el_phone: string;
+  el_birth_date: string; // 👈 Cambiado de el_age a el_birth_date
+
   event_name: string;
-  ref_asignatura: string;
-  ref_grupo: string;
-  ref_target: string[];
   [key: string]: string | string[];
 }
 
 interface FormStep {
-  id: keyof FinanceEntryForm;
+  id: keyof MatrimonioForm;
   label: string;
-  type: "text" | "number" | "select";
+  type: "text" | "date"; // 👈 Permitimos tipo "date" para el input nativo de calendario
   placeholder?: string;
   mandatory: boolean;
-  options?: string[];
 }
 
-// 2. Definición de Props compatible con Next.js 15 (Promise)
 interface PageProps {
   params: Promise<{
     formid: string;
@@ -39,116 +37,147 @@ interface PageProps {
 }
 
 export default function DynamicFormPage({ params }: PageProps) {
-  // Desatamos la promesa de params usando el hook 'use'
   const { formid } = use(params);
-
   const supabase = createClientComponentClient();
+
   const [currentStep, setCurrentStep] = useState<number>(-1);
   const [isSending, setIsSending] = useState<boolean>(false);
 
-  const [formData, setFormData] = useState<FinanceEntryForm>({
-    rut: "",
-    name: "",
-    last_name: "",
-    second_last_name: "",
-    phone: "",
-    apoderado: "",
-    contactoapoderado: "",
-    age: "",
+  const [formData, setFormData] = useState<MatrimonioForm>({
+    ella_rut: "",
+    ella_name: "",
+    ella_last_name: "",
+    ella_phone: "",
+    ella_birth_date: "", // 👈 Estado inicial limpio
+    el_rut: "",
+    el_name: "",
+    el_last_name: "",
+    el_phone: "",
+    el_birth_date: "", // 👈 Estado inicial limpio
     event_name: formid,
-    ref_asignatura: "",
-    ref_grupo: "",
-    ref_target: [],
   });
 
-  // Sincronizar ivercapacita si el formid cambia
   useEffect(() => {
     setFormData((prev) => ({ ...prev, event_name: formid }));
   }, [formid]);
 
   const formSteps: FormStep[] = [
+    // --- DATOS DE ELLA ---
     {
-      id: "rut",
-      label: "RUT",
+      id: "ella_rut",
+      label: "RUT de Ella",
       type: "text",
       placeholder: "12.345.678-9",
       mandatory: true,
     },
     {
-      id: "name",
-      label: "Nombre",
+      id: "ella_name",
+      label: "Nombre de Ella",
       type: "text",
-      placeholder: "Ej: Juan",
+      placeholder: "Ej: María",
       mandatory: true,
     },
     {
-      id: "last_name",
-      label: "Apellidos",
+      id: "ella_last_name",
+      label: "Apellidos de Ella",
       type: "text",
       placeholder: "Ej: Pérez Soto",
       mandatory: true,
     },
     {
-      id: "phone",
-      label: "Teléfono",
+      id: "ella_phone",
+      label: "Teléfono de Ella",
       type: "text",
       placeholder: "912345678",
       mandatory: true,
     },
     {
-      id: "age",
-      label: "Edad",
+      id: "ella_birth_date",
+      label: "Fecha de nacimiento de Ella",
+      type: "date", // 👈 Despliega el calendario nativo
+      mandatory: false,
+    },
+    // --- DATOS DE ÉL ---
+    {
+      id: "el_rut",
+      label: "RUT de Él",
       type: "text",
-      placeholder: "30",
+      placeholder: "12.345.678-9",
+      mandatory: true,
+    },
+    {
+      id: "el_name",
+      label: "Nombre de Él",
+      type: "text",
+      placeholder: "Ej: Juan",
+      mandatory: true,
+    },
+    {
+      id: "el_last_name",
+      label: "Apellidos de Él",
+      type: "text",
+      placeholder: "Ej: Muñoz Gomez",
+      mandatory: true,
+    },
+    {
+      id: "el_phone",
+      label: "Teléfono de Él",
+      type: "text",
+      placeholder: "987654321",
+      mandatory: true,
+    },
+    {
+      id: "el_birth_date",
+      label: "Fecha de nacimiento de Él",
+      type: "date", // 👈 Despliega el calendario nativo
       mandatory: false,
     },
   ];
 
-  const handleChange = (id: keyof FinanceEntryForm, value: string) => {
+  const handleChange = (id: keyof MatrimonioForm, value: string) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleSubmit = async () => {
     setIsSending(true);
+
     const { error: insertError } = await supabase
-      .from("temp_registros")
-      .insert([{ ...formData, event_name: formid }]);
+      .from("matrimonios")
+      .insert([formData]);
 
     setIsSending(false);
 
     if (insertError) {
-      Swal.fire("Error", insertError.message, "error");
+      Swal.fire("Error al guardar", insertError.message, "error");
       return;
     }
 
     Swal.fire(
-      "Genial!!",
-      "Has quedado inscrita para " + formid,
+      "¡Genial!",
+      "Han quedado inscritos exitosamente para " + formid,
       "success",
     ).then(() => {
       setFormData({
-        rut: "",
-        name: "",
-        last_name: "",
-        second_last_name: "",
-        phone: "",
-        apoderado: "",
-        contactoapoderado: "",
-        age: "",
+        ella_rut: "",
+        ella_name: "",
+        ella_last_name: "",
+        ella_phone: "",
+        ella_birth_date: "",
+        el_rut: "",
+        el_name: "",
+        el_last_name: "",
+        el_phone: "",
+        el_birth_date: "",
         event_name: formid,
-        ref_asignatura: "",
-        ref_grupo: "",
-        ref_target: [],
       });
       setCurrentStep(-1);
     });
   };
 
   const currentField = formSteps[currentStep];
+
   const isNextDisabled =
-    currentStep >= 0 &&
-    formSteps[currentStep].mandatory &&
-    !formData[formSteps[currentStep].id];
+    currentStep >= 0 && currentField.mandatory && !formData[currentField.id];
 
   return (
     <div className="flex min-h-[90%] items-center justify-center p-4 font-sans text-slate-900">
@@ -170,17 +199,11 @@ export default function DynamicFormPage({ params }: PageProps) {
         <div className="flex flex-1 flex-col">
           {currentStep === -1 ? (
             <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden text-center">
-              {/* <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: "url('/Imagen.jpeg')" }}
-              /> */}
-              {/* Overlay: Capa oscura o clara para dar legibilidad al texto */}
               <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px]" />
 
-              {/* Contenido (z-10 para estar por encima del fondo y el overlay) */}
               <div className="relative z-10 p-8">
                 <h1 className="text-4xl font-black tracking-tight text-slate-900">
-                  Iver Mujeres, Marzo 2026
+                  Seminario de Matrimonios 2026
                 </h1>
                 <p className="mt-4 text-lg text-slate-700">
                   Inicia tu registro para el formulario{" "}
@@ -198,18 +221,14 @@ export default function DynamicFormPage({ params }: PageProps) {
             </div>
           ) : (
             <>
-              {/* 1. Fondo difuminado (Debe estar fuera del flujo del contenido) */}
               <div
                 className="absolute inset-0 scale-110 bg-cover bg-center bg-no-repeat blur-md"
                 style={{ backgroundImage: "url('/Imagen.jpeg')" }}
               />
 
-              {/* 2. Overlay que unifica toda la tarjeta */}
               <div className="absolute inset-0 bg-white/40 backdrop-blur-[4px]" />
 
-              {/* 3. Contenedor de contenido ÚNICO (z-10) */}
               <div className="relative z-10 flex flex-1 flex-col">
-                {/* Bloque de Pregunta */}
                 <div className="flex flex-1 flex-col justify-center p-8 pb-0">
                   <span className="mb-2 text-xs font-black tracking-widest text-pink-600 uppercase">
                     Paso {currentStep + 1} de {formSteps.length}
@@ -226,7 +245,7 @@ export default function DynamicFormPage({ params }: PageProps) {
                     autoFocus
                     type={currentField.type}
                     placeholder={currentField.placeholder}
-                    value={formData[currentField.id] as string}
+                    value={(formData[currentField.id] as string) || ""}
                     onChange={(e) =>
                       handleChange(currentField.id, e.target.value)
                     }
@@ -234,7 +253,6 @@ export default function DynamicFormPage({ params }: PageProps) {
                   />
                 </div>
 
-                {/* Bloque de Botones */}
                 <div className="flex items-center justify-between gap-6 p-8">
                   <button
                     onClick={() => setCurrentStep(currentStep - 1)}
