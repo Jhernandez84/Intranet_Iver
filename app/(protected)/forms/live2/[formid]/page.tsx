@@ -1,63 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useParams, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import Image from "next/image";
-import Link from "next/link";
 import Swal from "sweetalert2";
 
+// 1. Interfaz estricta con index signature seguro para evitar el uso de 'any'
 interface FinanceEntryForm {
   rut: string;
   name: string;
   last_name: string;
   second_last_name: string;
   phone: string;
+  fec_nac: string;
   apoderado: string;
   contactoapoderado: string;
-  ivercapacita: string;
   ref_asignatura: string;
   ref_grupo: string;
-  ref_target: string[]; // ✅ Corrected type: array of strings
+  ref_target: string[];
+  [key: string]: string | string[];
+}
+
+interface FormStep {
+  id: keyof FinanceEntryForm;
+  label: string;
+  type: "text" | "tel" | "date" | "select"; // 👈 Añadido tipo 'select'
+  placeholder?: string;
+  mandatory: boolean;
+  options?: string[]; // 👈 Añadido para pasar las opciones del dropdown
 }
 
 export default function LiveFormsPage2() {
   const supabase = createClientComponentClient();
-
-  const router = useRouter();
-
   const { formid } = useParams<{ formid: string }>();
   const search = useSearchParams();
   const program = search.get("program") ?? "";
 
-  const [showModal, setShowModal] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-
-  const [sendind, setIsSending] = useState(false);
-  const [insertError, setSaveError] = useState<string | null>(null);
-
-  const handleShowConfirm = () => {
-    Swal.fire({
-      title: "Muchas gracias por inscribirse",
-      text: "Pronto le contactarán para una breve entrevista",
-      icon: "success",
-    });
-
-    // setShowModal(true);
-
-    // setTimeout(() => {
-    //   setShowModal(false);
-    //   // router.push(`/forms/workspace/PostulaIverKids`);
-    // }, 2000);
-  };
-
-  const handleShowAlert = () => {
-    setShowAlert(true);
-    setTimeout(() => {
-      setShowAlert(false);
-    }, 5000);
-  };
+  // Control de pasos del flujo de la Card (-1 es la vista de bienvenida)
+  const [currentStep, setCurrentStep] = useState<number>(-1);
+  const [isSending, setIsSending] = useState<boolean>(false);
 
   const [form, setForm] = useState<FinanceEntryForm>({
     rut: "",
@@ -65,351 +46,268 @@ export default function LiveFormsPage2() {
     last_name: "",
     second_last_name: "",
     phone: "",
-    ivercapacita: formid,
+    fec_nac: "",
     contactoapoderado: "",
     apoderado: "",
     ref_asignatura: "",
     ref_grupo: "",
-    ref_target: [], // ✅ Initial state with an empty array
+    ref_target: [],
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-
-    setForm((prevForm) => {
-      if (checked) {
-        // ✅ Add the value to the ref_target array
-        return {
-          ...prevForm,
-          ref_target: [...prevForm.ref_target, value],
-        };
-      } else {
-        // ✅ Remove the value from the ref_target array
-        return {
-          ...prevForm,
-          ref_target: prevForm.ref_target.filter((item) => item !== value),
-        };
-      }
-    });
-  };
-
+  // Sincronizar identificador del formulario si cambia dinámicamente
   useEffect(() => {
-    console.log("Form ID:", formid, "Program:", program);
-  }, [formid, program]);
+    if (formid) {
+      setForm((prev) => ({ ...prev, event_name: formid }));
+    }
+  }, [formid]);
+
+  // Definición de los pasos secuenciales de la tarjeta
+  const formSteps: FormStep[] = [
+    {
+      id: "rut",
+      label: "Ingresa tu Rut",
+      type: "text",
+      placeholder: "12345678",
+      mandatory: true,
+    },
+    {
+      id: "name",
+      label: "Ingresa tu nombre",
+      type: "text",
+      placeholder: "John",
+      mandatory: true,
+    },
+    {
+      id: "last_name",
+      label: "Ingresa tu apellido paterno",
+      type: "text",
+      placeholder: "Ej: Pérez",
+      mandatory: true,
+    },
+    {
+      id: "second_last_name",
+      label: "Ingresa tu apellido materno",
+      type: "text",
+      placeholder: "Ej: Soto",
+      mandatory: true,
+    },
+    {
+      id: "phone",
+      label: "Ingresa tu teléfono de contacto",
+      type: "tel",
+      placeholder: "999999999",
+      mandatory: true,
+    },
+    {
+      id: "fec_nac",
+      label: "Ingresa tu fecha de nacimiento",
+      type: "date",
+      mandatory: true,
+    },
+    // 👈 NUEVO PASO FINAL: Dropdown obligatorio
+    {
+      id: "ref_grupo",
+      label: "En que Iver participas",
+      type: "select",
+      mandatory: true,
+      options: [
+        "Iver Central",
+        "Iver Litoral",
+        "Iver Curicó",
+        "Iver Nancagua",
+        "Iver San Clemente",
+        "Iver Talca",
+        "Iver Talcahuano",
+      ],
+    },
+  ];
+
+  const handleInputChange = (id: keyof FinanceEntryForm, value: string) => {
+    setForm((prev) => ({ ...prev, [id]: value }));
+  };
 
   const handleSubmit = async () => {
-    console.log("guardando");
     setIsSending(true);
-    setSaveError(null);
 
     const { error: insertError } = await supabase
       .from("temp_registros")
-      .insert([
-        {
-          ...form,
-          // Convert array to string for Supabase TEXT column if needed
-          // ref_target: form.ref_target.join(','),
-        },
-      ]);
+      .insert([form]);
+
+    setIsSending(false);
 
     if (insertError) {
-      console.error(
-        "Error al guardar movimiento financiero:",
-        insertError.message,
-      );
-      setSaveError(insertError.message);
-      handleShowAlert();
-      setForm({
-        rut: "",
-        name: "",
-        last_name: "",
-        second_last_name: "",
-        phone: "",
-        apoderado: "",
-        contactoapoderado: "",
-        ivercapacita: formid,
-        ref_asignatura: "",
-        ref_grupo: "",
-        ref_target: [], // ✅ Reset the form correctly
+      console.error("Error al guardar registro:", insertError.message);
+      Swal.fire({
+        title: "Error al guardar",
+        text: insertError.message,
+        icon: "error",
       });
       return;
-    } else {
-      console.log("Registro guardado exitosamente");
+    }
+
+    Swal.fire({
+      title: "Muchas gracias por tu registro",
+      text: "Estamos en contacto!",
+      icon: "success",
+    }).then(() => {
+      // Limpieza completa tras guardar con éxito
       setForm({
         rut: "",
         name: "",
         last_name: "",
         second_last_name: "",
         phone: "",
+        fec_nac: "",
         apoderado: "",
         contactoapoderado: "",
-        ivercapacita: formid,
         ref_asignatura: "",
         ref_grupo: "",
         ref_target: [],
       });
-    }
-
-    setIsSending(false);
-    handleShowConfirm();
+      setCurrentStep(-1);
+    });
   };
 
-  // ... (JSX for the form remains largely the same)
+  const currentField = formSteps[currentStep];
+
+  // Validación estricta en base al valor actual almacenado en el paso
+  const isNextDisabled =
+    currentStep >= 0 && currentField.mandatory && !form[currentField.id];
+
   return (
-    <div className="align-center inline w-[50%] justify-center overflow-auto p-6">
-      <div className="pb-2 text-center text-xl text-white">
-        <h1>{formid}</h1>
-      </div>
-
-      {/* <Image
-        src="/LogoIverKids.jpeg"
-        alt="LogoIverKids"
-        width={140}
-        height={0}
-        quality={100}
-        className="mx-auto mb-2 mb-4 block rounded-lg object-cover"
-      /> */}
-
-      <div className="text-md pb-4 text-center text-white">
-        <p>
-          Si deseas ser parte de los equipos de trabajo de Iver: Relaciones
-          Públicas y Estacionamientos, te invitamos a completar tus datos en el
-          siguiente link.
-        </p>
-      </div>
-      <form className="sm:align-center pr-10 pl-10">
-        <div className="mb-6 grid gap-4">
-          <div>
-            <label
-              htmlFor="rut"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Rut
-            </label>
-
-            <input
-              type="text"
-              id="rut"
-              name="rut"
-              maxLength={8}
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="12345678"
-              value={form.rut}
-              onChange={handleChange}
-              required
-              autoComplete="off"
+    <div className="flex min-h-screen items-center justify-center p-4 font-sans text-slate-900">
+      {/* Contenedor Principal tipo Card */}
+      <div className="relative flex min-h-[450px] w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl transition-all">
+        {/* Barra de Progreso Superior */}
+        {currentStep >= 0 && (
+          <div className="absolute top-0 left-0 h-2 w-full bg-gray-100">
+            <div
+              className="h-full bg-emerald-600 transition-all duration-500 ease-in-out"
+              style={{
+                width: `${((currentStep + 1) / formSteps.length) * 100}%`,
+              }}
             />
           </div>
+        )}
 
-          <div>
-            <label
-              htmlFor="name"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Nombres
-            </label>
+        <div className="flex flex-1 flex-col p-8">
+          {currentStep === -1 ? (
+            /* --- CARD DE BIENVENIDA --- */
+            <div className="flex flex-1 flex-col items-center justify-center text-center">
+              <h1 className="text-3xl font-black tracking-tight text-gray-900">
+                {formid}
+              </h1>
+              <p className="mt-4 text-base text-gray-600">
+                Te invitamos a completar tus datos y estar aún más conectados
+                con nuestro Iver Jóvenes!
+              </p>
 
-            <input
-              type="text"
-              id="name"
-              name="name"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="John"
-              value={form.name}
-              onChange={handleChange}
-              required
-              autoComplete="given-name"
-            />
-          </div>
+              <div className="mt-8 flex w-full flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(0)}
+                  className="w-full rounded-xl bg-emerald-600 py-3.5 font-bold text-white shadow-lg shadow-emerald-100 transition-all hover:bg-emerald-700 active:scale-98"
+                >
+                  Comenzar registro
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* --- CARDS SECUENCIALES DE PREGUNTAS --- */
+            <div className="flex flex-1 flex-col justify-between">
+              {/* Bloque del Input o Dropdown */}
+              <div className="flex flex-1 flex-col justify-center py-6">
+                <span className="mb-2 text-xs font-bold tracking-widest text-emerald-600 uppercase">
+                  Paso {currentStep + 1} de {formSteps.length}
+                </span>
 
-          <div>
-            <label
-              htmlFor="last_name"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Apellido Paterno
-            </label>
+                <label
+                  htmlFor={`${currentField.id}`}
+                  className="mb-6 block text-2xl leading-tight font-bold text-gray-800"
+                >
+                  {currentField.label}
+                  {currentField.mandatory && (
+                    <span className="ml-1 text-red-500">*</span>
+                  )}
+                </label>
 
-            <input
-              type="text"
-              id="last_name"
-              name="last_name"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Apellido Paterno"
-              value={form.last_name}
-              onChange={handleChange}
-              required
-              autoComplete="family-name"
-            />
-          </div>
+                {currentField.type === "select" ? (
+                  /* RENDERIZADO DEL DROPDOWN */
+                  <select
+                    key={currentField.id}
+                    id={`${currentField.id}`}
+                    name={`${currentField.id}`}
+                    value={(form[currentField.id] as string) || ""}
+                    onChange={(e) =>
+                      handleInputChange(currentField.id, e.target.value)
+                    }
+                    className="w-full rounded-xl border-2 border-gray-200 bg-white p-4 text-lg shadow-sm transition-all outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                  >
+                    <option value="" disabled>
+                      -- Selecciona una opción --
+                    </option>
+                    {currentField.options?.map((option, idx) => (
+                      <option key={idx} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  /* RENDERIZADO DEL INPUT ESTÁNDAR */
+                  <input
+                    key={currentField.id}
+                    id={`${currentField.id}`}
+                    name={`${currentField.id}`}
+                    autoFocus
+                    type={currentField.type}
+                    placeholder={currentField.placeholder}
+                    value={(form[currentField.id] as string) || ""}
+                    onChange={(e) =>
+                      handleInputChange(currentField.id, e.target.value)
+                    }
+                    className="w-full rounded-xl border-2 border-gray-200 p-4 text-lg shadow-sm transition-all outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    autoComplete="off"
+                  />
+                )}
+              </div>
 
-          <div>
-            <label
-              htmlFor="second_last_name"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Apellido Materno
-            </label>
+              {/* Bloque de Navegación de la Card */}
+              <div className="mt-6 flex items-center justify-between gap-4 border-t border-gray-100 pt-6">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                  className="px-2 text-sm font-bold tracking-wider text-gray-500 uppercase transition-colors hover:text-gray-800"
+                >
+                  Atrás
+                </button>
 
-            <input
-              type="text"
-              id="second_last_name"
-              name="second_last_name"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Apellido Materno"
-              value={form.second_last_name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="phone"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Teléfono
-            </label>
-
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="999999999"
-              value={form.phone}
-              onChange={handleChange}
-              required
-              // Si quieres validar formato chileno, podrías usar un pattern:
-              // pattern="^\d{9}$"
-            />
-          </div>
-
-          {/* <div>
-            <label
-              htmlFor="ref_asignatura"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              ¿Actualmente hace clases en algún establecimiento eduacional?
-            </label>
-            <select
-              id="ref_asignatura"
-              name="ref_asignatura"
-              value={form.ref_asignatura}
-              onChange={handleChange}
-              className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              required
-            >
-              <option value="NO">No</option>
-              <option value="SI">Si</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="ref_grupo"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              ¿Ha participado antes en escuelas para niños en alguna iglesia?
-            </label>
-
-            <select
-              id="ref_grupo"
-              name="ref_grupo"
-              value={form.ref_grupo}
-              onChange={handleChange}
-              className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              required
-            >
-              <option value="NO">No</option>
-              <option value="SI">Si</option>
-            </select>
-          </div> */}
-        </div>
-
-        {/* ... (Buttons) ... */}
-        {form.rut &&
-          form.name &&
-          form.last_name &&
-          form.second_last_name &&
-          form.phone && (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 focus:ring-4 focus:ring-green-300 focus:outline-none dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-            >
-              Enviar ✅
-            </button>
+                <button
+                  type="button"
+                  disabled={isSending || isNextDisabled}
+                  onClick={() => {
+                    if (currentStep < formSteps.length - 1) {
+                      setCurrentStep(currentStep + 1);
+                    } else {
+                      handleSubmit();
+                    }
+                  }}
+                  className={`flex-1 rounded-xl py-3.5 text-base font-bold text-white shadow-md transition-all active:scale-98 ${
+                    isSending || isNextDisabled
+                      ? "cursor-not-allowed bg-gray-200 text-gray-400 shadow-none"
+                      : "bg-emerald-600 shadow-emerald-100 hover:bg-emerald-700"
+                  }`}
+                >
+                  {isSending
+                    ? "Guardando..."
+                    : currentStep === formSteps.length - 1
+                      ? "Enviar ✅"
+                      : "Siguiente"}
+                </button>
+              </div>
+            </div>
           )}
-
-        <Link href={`/forms/workspace/IverCapacita`}>
-          <button
-            type="button"
-            className="me-2 mb-2 w-full cursor-pointer rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-600"
-          >
-            Regresar ⬅️
-          </button>
-        </Link>
-      </form>
-
-      {showModal && (
-        <div
-          id="toast-success"
-          className="fixed top-4 right-4 z-50 mb-4 flex w-full max-w-xs items-center rounded-lg bg-white p-4 text-gray-700 shadow-lg dark:bg-gray-800 dark:text-gray-200"
-          role="status"
-          aria-live="polite"
-        >
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200">
-            <svg
-              className="h-5 w-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-            </svg>
-
-            <span className="sr-only">Felicidades</span>
-          </div>
-
-          <div className="ms-3 text-sm font-medium">
-            Felicidades!! has quedado inscrito para {form.ivercapacita} !!
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowModal(false)}
-            className="-mx-1.5 -my-1.5 ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 focus:ring-2 focus:ring-gray-300 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-white"
-            aria-label="Cerrar"
-          >
-            <svg
-              className="h-3 w-3"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 14 14"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-              />
-            </svg>
-          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
