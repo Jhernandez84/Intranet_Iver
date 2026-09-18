@@ -20,7 +20,7 @@ export default async function EditFormPage({
   if (!row) notFound();
 
   return (
-    <div className="mx-auto w-full max-w-3xl p-4">
+    <div className="mx-auto w-[95%] p-4">
       <FormBuilder initialForm={formRowToDefinition(row)} />
     </div>
   );

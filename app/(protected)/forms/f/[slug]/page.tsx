@@ -77,64 +77,37 @@ export default async function PublicFormPage({
   }
 
   const isCard = form.display_mode === "card";
-  const heading = form.cover_title || form.name;
 
   return (
     <div
       className={
         isCard
-          ? "flex min-h-screen items-center justify-center bg-gray-100 p-6 dark:bg-gray-900"
-          : "min-h-screen bg-white dark:bg-gray-900"
+          ? "flex h-[calc(100vh-70px)] items-center justify-center overflow-y-auto bg-gray-100 p-6 dark:bg-gray-900"
+          : "h-[calc(100vh-70px)] overflow-y-auto bg-white dark:bg-gray-900"
       }
     >
       <div
         className={
           isCard
-            ? "flex w-full max-w-md flex-col overflow-hidden rounded-xl bg-white shadow-xl sm:h-[40vh] sm:min-h-[380px] sm:w-[60vw] sm:max-w-2xl dark:bg-gray-800"
-            : "mx-auto max-w-xl"
+            ? "flex w-full max-w-md flex-col overflow-y-auto rounded-xl bg-white p-6 shadow-xl sm:h-[40vh] sm:min-h-[380px] sm:w-[60vw] sm:max-w-2xl sm:p-8 dark:bg-gray-800"
+            : "mx-auto max-w-xl p-6"
         }
       >
-        {form.cover_image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={form.cover_image_url}
-            alt=""
-            className={
-              isCard
-                ? "h-32 w-full flex-shrink-0 object-cover"
-                : "h-56 w-full object-cover"
-            }
-          />
-        )}
-
-        <div
-          className={
-            isCard
-              ? "flex flex-1 flex-col overflow-y-auto p-6 sm:p-8"
-              : "p-6"
-          }
-        >
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {heading}
-          </h1>
-          {form.cover_subtitle && (
-            <p className="mt-1 text-gray-500 dark:text-gray-400">
-              {form.cover_subtitle}
-            </p>
-          )}
-
-          <div className={isCard ? "mt-6 flex flex-1 flex-col" : "mt-6"}>
-            <PublicFormClient
-              slug={slug}
-              fields={form.fields}
-              submitDisabledReason={submitDisabledReason}
-              successTitle={form.success_title}
-              successBody={form.success_body}
-              redirectUrl={form.redirect_url}
-              paged={isCard}
-            />
-          </div>
-        </div>
+        <PublicFormClient
+          slug={slug}
+          fields={form.fields}
+          submitDisabledReason={submitDisabledReason}
+          successTitle={form.success_title}
+          successBody={form.success_body}
+          redirectUrl={form.redirect_url}
+          redirectLabel={form.redirect_label}
+          paged={isCard}
+          formName={form.name}
+          coverImageUrl={form.cover_image_url}
+          coverTitle={form.cover_title}
+          coverSubtitle={form.cover_subtitle}
+          themeColor={form.theme_color}
+        />
       </div>
     </div>
   );
@@ -148,7 +121,7 @@ function UnavailableMessage({
   detail: string;
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center p-6 dark:bg-gray-900">
+    <div className="flex h-[calc(100vh-70px)] items-center justify-center overflow-y-auto p-6 dark:bg-gray-900">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-bold text-gray-900 dark:text-white">
           {title}

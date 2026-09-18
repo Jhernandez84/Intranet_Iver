@@ -20,6 +20,7 @@ export interface FieldDefinition {
 
 export type FormStatus = "draft" | "published" | "closed";
 export type DisplayMode = "fullscreen" | "card";
+export type RedirectType = "whatsapp" | "instagram" | "website" | "other";
 
 export interface FormDefinition {
   id: string;
@@ -40,9 +41,14 @@ export interface FormDefinition {
   successTitle: string | null;
   successBody: string | null;
   redirectUrl: string | null;
+  redirectLabel: string | null;
+  redirectType: RedirectType | null;
+  redirectWhatsappPhone: string | null;
+  redirectMessage: string | null;
   opensAt: string | null;
   closesAt: string | null;
   price: number | null;
+  themeColor: string | null;
 }
 
 export interface FormResponseRow {
@@ -74,9 +80,14 @@ export interface FormRow {
   success_title: string | null;
   success_body: string | null;
   redirect_url: string | null;
+  redirect_label: string | null;
+  redirect_type: RedirectType | null;
+  redirect_whatsapp_phone: string | null;
+  redirect_message: string | null;
   opens_at: string | null;
   closes_at: string | null;
   price: number | null;
+  theme_color: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -112,8 +123,13 @@ export function formRowToDefinition(row: FormRow): FormDefinition {
     successTitle: row.success_title,
     successBody: row.success_body,
     redirectUrl: row.redirect_url,
+    redirectLabel: row.redirect_label,
+    redirectType: row.redirect_type,
+    redirectWhatsappPhone: row.redirect_whatsapp_phone,
+    redirectMessage: row.redirect_message,
     opensAt: row.opens_at,
     closesAt: row.closes_at,
     price: row.price,
+    themeColor: row.theme_color,
   };
 }

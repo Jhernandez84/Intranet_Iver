@@ -62,8 +62,6 @@ export default async function RootLayout({
 
                   {/* Contenido con scroll propio */}
                   <main className="h-[calc(100vh-70px)] w-full bg-gray-500 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-                    {/* Si tienes Sidebar/AppsMenu dentro del contenido, envuélvelos aquí */}
-                    {/* <Sidebar /> / <AppsMenu /> si aplica */}
                     <div>{children}</div>
                   </main>
                 </body>

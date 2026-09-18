@@ -3,18 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { HiArrowLeft } from "react-icons/hi";
+import { HiArrowLeft, HiCheck, HiX } from "react-icons/hi";
 import {
   Button,
   Label,
   TextInput,
   Textarea,
+  Select,
   Checkbox,
   Modal,
   ModalHeader,
   ModalBody,
+  Toast,
+  ToastToggle,
 } from "flowbite-react";
-import Swal from "sweetalert2";
 import FieldList from "../../_components/FieldList";
 import FieldConfigPanel from "../../_components/FieldConfigPanel";
 import FieldOptionsPanel from "../../_components/FieldOptionsPanel";
@@ -26,6 +28,7 @@ import type {
   FieldDefinition,
   FieldType,
   FormDefinition,
+  RedirectType,
 } from "../../../../lib/forms/types";
 
 interface FormBuilderProps {
@@ -47,6 +50,14 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
   const [redirectEnabled, setRedirectEnabled] = useState(
     !!initialForm.redirectUrl,
   );
+  const [toast, setToast] = useState<
+    { type: "success" | "error"; message: string } | null
+  >(null);
+
+  const showToast = (type: "success" | "error", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const publicUrl =
     typeof window !== "undefined"
@@ -103,6 +114,23 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
     }));
   };
 
+  const buildWhatsappUrl = (phone: string, message: string) => {
+    const cleanPhone = phone.replace(/[^0-9]/g, "");
+    if (!cleanPhone) return null;
+    return `https://wa.me/${cleanPhone}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
+  };
+
+  const updateWhatsappRedirect = (patch: { phone?: string; message?: string }) => {
+    const phone = patch.phone ?? form.redirectWhatsappPhone ?? "";
+    const message = patch.message ?? form.redirectMessage ?? "";
+    setForm({
+      ...form,
+      redirectWhatsappPhone: patch.phone ?? form.redirectWhatsappPhone,
+      redirectMessage: patch.message ?? form.redirectMessage,
+      redirectUrl: buildWhatsappUrl(phone, message),
+    });
+  };
+
   const handleSave = async (nextStatus = form.status) => {
     setSaving(true);
     try {
@@ -122,24 +150,26 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
         successTitle: form.successTitle,
         successBody: form.successBody,
         redirectUrl: form.redirectUrl,
+        redirectLabel: form.redirectLabel,
+        redirectType: form.redirectType,
+        redirectWhatsappPhone: form.redirectWhatsappPhone,
+        redirectMessage: form.redirectMessage,
         opensAt: form.opensAt,
         closesAt: form.closesAt,
         price: form.price,
+        themeColor: form.themeColor,
       });
       setForm((prev) => ({ ...prev, status: nextStatus }));
-      Swal.fire({
-        icon: "success",
-        title: nextStatus === "published" ? "Formulario publicado" : "Guardado",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+      showToast(
+        "success",
+        nextStatus === "published" ? "Formulario publicado" : "Guardado",
+      );
       router.refresh();
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "No se pudo guardar",
-        text: err instanceof Error ? err.message : undefined,
-      });
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "No se pudo guardar",
+      );
     } finally {
       setSaving(false);
     }
@@ -245,8 +275,8 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
       )}
 
       {activeTab === "ajustes" && (
-        <div className="flex max-w-xl flex-col gap-6 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-          <section className="flex flex-col gap-4">
+        <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <section className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="text-xs font-semibold text-gray-400 uppercase">
               General
             </h3>
@@ -285,7 +315,7 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+          <section className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="text-xs font-semibold text-gray-400 uppercase">
               Portada
             </h3>
@@ -318,9 +348,32 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
                 }
               />
             </div>
+            <div>
+              <Label htmlFor="theme-color">Color de acento</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  id="theme-color"
+                  type="color"
+                  value={form.themeColor ?? "#1c64f2"}
+                  onChange={(e) =>
+                    setForm({ ...form, themeColor: e.target.value })
+                  }
+                  className="h-9 w-14 cursor-pointer rounded border border-gray-300 dark:border-gray-600"
+                />
+                {form.themeColor && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, themeColor: null })}
+                    className="text-sm text-red-600 hover:underline"
+                  >
+                    Usar color por defecto
+                  </button>
+                )}
+              </div>
+            </div>
           </section>
 
-          <section className="flex flex-col gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+          <section className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="text-xs font-semibold text-gray-400 uppercase">
               Cupos y duplicados
             </h3>
@@ -373,7 +426,7 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+          <section className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="text-xs font-semibold text-gray-400 uppercase">
               Después de enviar
             </h3>
@@ -409,6 +462,8 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
                   setRedirectEnabled(e.target.checked);
                   if (!e.target.checked) {
                     setForm({ ...form, redirectUrl: null });
+                  } else if (!form.redirectType) {
+                    setForm({ ...form, redirectType: "website" });
                   }
                 }}
               />
@@ -417,27 +472,106 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
               </Label>
             </div>
             {redirectEnabled && (
-              <div>
-                <Label htmlFor="redirect-url">URL de destino</Label>
-                <TextInput
-                  id="redirect-url"
-                  type="url"
-                  placeholder="https://wa.me/..."
-                  value={form.redirectUrl ?? ""}
-                  onChange={(e) =>
-                    setForm({ ...form, redirectUrl: e.target.value || null })
-                  }
-                />
-                <p className="mt-1 text-xs text-gray-400">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <Label htmlFor="redirect-label">Nombre para mostrar</Label>
+                  <TextInput
+                    id="redirect-label"
+                    placeholder="Únete a nuestro grupo de WhatsApp"
+                    value={form.redirectLabel ?? ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        redirectLabel: e.target.value || null,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="redirect-type">Tipo de enlace</Label>
+                  <Select
+                    id="redirect-type"
+                    value={form.redirectType ?? "website"}
+                    onChange={(e) => {
+                      const type = e.target.value as RedirectType;
+                      if (type === "whatsapp") {
+                        setForm({
+                          ...form,
+                          redirectType: type,
+                          redirectUrl: buildWhatsappUrl(
+                            form.redirectWhatsappPhone ?? "",
+                            form.redirectMessage ?? "",
+                          ),
+                        });
+                      } else {
+                        setForm({ ...form, redirectType: type, redirectUrl: null });
+                      }
+                    }}
+                  >
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="website">Página web</option>
+                    <option value="other">Otro</option>
+                  </Select>
+                </div>
+
+                {form.redirectType === "whatsapp" ? (
+                  <>
+                    <div>
+                      <Label htmlFor="redirect-whatsapp-phone">
+                        Número de WhatsApp (con código de país, solo números)
+                      </Label>
+                      <TextInput
+                        id="redirect-whatsapp-phone"
+                        placeholder="56912345678"
+                        value={form.redirectWhatsappPhone ?? ""}
+                        onChange={(e) =>
+                          updateWhatsappRedirect({ phone: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="redirect-message">
+                        Mensaje predefinido
+                      </Label>
+                      <Textarea
+                        id="redirect-message"
+                        placeholder="Hola, quiero inscribirme en..."
+                        value={form.redirectMessage ?? ""}
+                        onChange={(e) =>
+                          updateWhatsappRedirect({ message: e.target.value })
+                        }
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <Label htmlFor="redirect-url">URL de destino</Label>
+                    <TextInput
+                      id="redirect-url"
+                      type="url"
+                      placeholder="https://instagram.com/..."
+                      value={form.redirectUrl ?? ""}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          redirectUrl: e.target.value || null,
+                        })
+                      }
+                    />
+                  </div>
+                )}
+
+                <p className="text-xs text-gray-400">
                   La persona siempre ve el mensaje de agradecimiento; este botón
-                  le pregunta si quiere continuar a la URL, no la redirige
+                  le pregunta si quiere continuar, no la redirige
                   automáticamente.
                 </p>
               </div>
             )}
           </section>
 
-          <section className="flex flex-col gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+          <section className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="text-xs font-semibold text-gray-400 uppercase">
               Programación
             </h3>
@@ -474,7 +608,7 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
             </p>
           </section>
 
-          <section className="flex flex-col gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+          <section className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="text-xs font-semibold text-gray-400 uppercase">
               Notificaciones
             </h3>
@@ -542,13 +676,52 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
         <ModalBody>
           {form.displayMode === "card" ? (
             <div className="mx-auto flex h-[50vh] min-h-[380px] w-full max-w-md flex-col rounded-xl border border-gray-200 p-6 dark:border-gray-700">
-              <FormRenderer fields={form.fields} mode="preview" paged />
+              <FormRenderer
+                fields={form.fields}
+                mode="preview"
+                paged
+                formName={form.name}
+                coverImageUrl={form.coverImageUrl}
+                coverTitle={form.coverTitle}
+                coverSubtitle={form.coverSubtitle}
+                themeColor={form.themeColor}
+              />
             </div>
           ) : (
-            <FormRenderer fields={form.fields} mode="preview" />
+            <FormRenderer
+              fields={form.fields}
+              mode="preview"
+              formName={form.name}
+              coverImageUrl={form.coverImageUrl}
+              coverTitle={form.coverTitle}
+              coverSubtitle={form.coverSubtitle}
+              themeColor={form.themeColor}
+            />
           )}
         </ModalBody>
       </Modal>
+
+      {toast && (
+        <div className="fixed right-4 bottom-4 z-50">
+          <Toast>
+            <div
+              className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                toast.type === "success"
+                  ? "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200"
+                  : "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200"
+              }`}
+            >
+              {toast.type === "success" ? (
+                <HiCheck className="h-5 w-5" />
+              ) : (
+                <HiX className="h-5 w-5" />
+              )}
+            </div>
+            <div className="ml-3 text-sm font-normal">{toast.message}</div>
+            <ToastToggle onDismiss={() => setToast(null)} />
+          </Toast>
+        </div>
+      )}
     </div>
   );
 }

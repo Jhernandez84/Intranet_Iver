@@ -11,7 +11,13 @@ interface PublicFormClientProps {
   successTitle?: string | null;
   successBody?: string | null;
   redirectUrl?: string | null;
+  redirectLabel?: string | null;
   paged?: boolean;
+  formName?: string;
+  coverImageUrl?: string | null;
+  coverTitle?: string | null;
+  coverSubtitle?: string | null;
+  themeColor?: string | null;
 }
 
 export default function PublicFormClient({
@@ -21,7 +27,13 @@ export default function PublicFormClient({
   successTitle,
   successBody,
   redirectUrl,
+  redirectLabel,
   paged,
+  formName,
+  coverImageUrl,
+  coverTitle,
+  coverSubtitle,
+  themeColor,
 }: PublicFormClientProps) {
   const handleSubmit = async (answers: Record<string, unknown>) => {
     const result = await submitPublicResponse(slug, answers);
@@ -39,7 +51,13 @@ export default function PublicFormClient({
       successTitle={successTitle}
       successBody={successBody}
       redirectUrl={redirectUrl}
+      redirectLabel={redirectLabel}
       paged={paged}
+      formName={formName}
+      coverImageUrl={coverImageUrl}
+      coverTitle={coverTitle}
+      coverSubtitle={coverSubtitle}
+      themeColor={themeColor}
     />
   );
 }

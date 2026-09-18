@@ -20,7 +20,10 @@ export function buildZodSchemaFromFields(fields: FieldDefinition[]) {
       case "radio":
         schema =
           f.options && f.options.length > 0
-            ? z.enum(f.options as [string, ...string[]])
+            ? z.enum(
+                f.options as [string, ...string[]],
+                "Selecciona una opción válida",
+              )
             : z.string();
         break;
       case "date":

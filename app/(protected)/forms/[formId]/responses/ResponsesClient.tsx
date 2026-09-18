@@ -178,6 +178,7 @@ export default function ResponsesClient({
           <FormRenderer
             fields={fields}
             mode="public"
+            simple
             submitLabel="Guardar"
             onSubmit={async (answers) => {
               try {

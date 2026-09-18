@@ -3,7 +3,12 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "../../lib/supabase/server";
-import type { DisplayMode, FieldDefinition, FormStatus } from "../../lib/forms/types";
+import type {
+  DisplayMode,
+  FieldDefinition,
+  FormStatus,
+  RedirectType,
+} from "../../lib/forms/types";
 
 async function getCurrentUserCompany() {
   const supabase = await createClient();
@@ -65,9 +70,14 @@ export interface UpdateFormInput {
   successTitle: string | null;
   successBody: string | null;
   redirectUrl: string | null;
+  redirectLabel: string | null;
+  redirectType: RedirectType | null;
+  redirectWhatsappPhone: string | null;
+  redirectMessage: string | null;
   opensAt: string | null;
   closesAt: string | null;
   price: number | null;
+  themeColor: string | null;
 }
 
 export async function updateForm(formId: string, input: UpdateFormInput) {
@@ -91,9 +101,14 @@ export async function updateForm(formId: string, input: UpdateFormInput) {
       success_title: input.successTitle,
       success_body: input.successBody,
       redirect_url: input.redirectUrl,
+      redirect_label: input.redirectLabel,
+      redirect_type: input.redirectType,
+      redirect_whatsapp_phone: input.redirectWhatsappPhone,
+      redirect_message: input.redirectMessage,
       opens_at: input.opensAt,
       closes_at: input.closesAt,
       price: input.price,
+      theme_color: input.themeColor,
       updated_at: new Date().toISOString(),
     })
     .eq("id", formId);
@@ -132,7 +147,12 @@ export async function duplicateForm(formId: string) {
       success_title: original.success_title,
       success_body: original.success_body,
       redirect_url: original.redirect_url,
+      redirect_label: original.redirect_label,
+      redirect_type: original.redirect_type,
+      redirect_whatsapp_phone: original.redirect_whatsapp_phone,
+      redirect_message: original.redirect_message,
       price: original.price,
+      theme_color: original.theme_color,
       created_by: userId,
     })
     .select("id")
