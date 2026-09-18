@@ -3,7 +3,7 @@
 // app/components/Navbar.tsx
 import React, { useState } from "react";
 import Link from "next/link";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../lib/supabase/client";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ToggleSwitch } from "flowbite-react";
@@ -14,7 +14,7 @@ import { initFlowbite } from "flowbite";
 const SideBarCoffeeMenu = () => {
   const pathname = usePathname();
 
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const router = useRouter();
 
   // const { access, isLoadingAccess } = useUserAccess();

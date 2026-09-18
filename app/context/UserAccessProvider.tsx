@@ -8,7 +8,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../lib/supabase/client";
 import { useUser } from "./UserProvider";
 
 // 1) Tipos locales para el resultado del SELECT
@@ -52,7 +52,7 @@ export const UserAccessProvider = ({ children }: { children: ReactNode }) => {
 
   const [access, setAccess] = useState<UserAccess[] | null>(null);
   const [isLoadingAccess, setIsLoadingAccess] = useState(true);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     if (isLoading || !user) return;

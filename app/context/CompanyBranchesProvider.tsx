@@ -8,7 +8,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"; // O @supabase/ssr
+import { createClient } from "../lib/supabase/client";
 import { useUser } from "./UserProvider";
 
 // // 1. Define el tipo de datos para el acceso del usuario
@@ -41,7 +41,7 @@ export const CompanyBranchesProvider = ({
   const { user, isLoading } = useUser();
 
   const [branches, setBranches] = useState<BranchesAccess[] | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     // Función para cargar los datos del usuario

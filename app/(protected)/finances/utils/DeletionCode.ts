@@ -1,8 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "../../../lib/supabase/client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-
-const supabase = createClientComponentClient();
+const supabase = createClient();
 
 /**
  * T es el tipo de la fila de tu tabla (opcional)

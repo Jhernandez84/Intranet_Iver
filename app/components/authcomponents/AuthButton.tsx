@@ -1,7 +1,7 @@
 // app/components/AuthButton.tsx
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -12,7 +12,7 @@ import LoginModal from "../loginModal/LoginModal";
 export default function AuthButton() {
   const [user, setUser] = useState(null);
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     initFlowbite();

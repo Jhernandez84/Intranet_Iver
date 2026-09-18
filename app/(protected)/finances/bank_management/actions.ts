@@ -1,6 +1,6 @@
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../lib/supabase/client";
 
 // --- INTERFACES DE TIPADO ESTRICTO ---
 
@@ -77,7 +77,7 @@ export async function getUnreconciledCount(
   startDate: string,
   endDate: string,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const { count, error } = await supabase
     .from("bank_movements")
@@ -110,7 +110,7 @@ function parseChileanDate(dateValue: unknown): Date {
 }
 
 export async function fastUploadGetnet(companyId: string, rows: GetnetRow[]) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const { data: settings } = await supabase
     .from("bank_account_settings")
@@ -151,7 +151,7 @@ export async function fastUploadGetnet(companyId: string, rows: GetnetRow[]) {
 }
 
 export async function fastUploadTuu(companyId: string, rows: TuuExcelRow[]) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const { data: settings } = await supabase
     .from("bank_account_settings")
@@ -198,7 +198,7 @@ export async function syncTuuDataAction(
   startDate: string,
   endDate: string,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const TUU_API_URL =
     "https://integrations.payment.haulmer.com/Report/get-report";
 
@@ -293,7 +293,7 @@ export async function uploadBankMovements(
   rows: BankMovementRow[],
   //bankAccountId: string | 'a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5', // Recomiendo pasar este ID por parámetro
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const dataToInsert = rows.map((row) => {
     // 1. Lógica de Signos: Si es CARGO o CARGOS, el monto es negativo
@@ -382,7 +382,7 @@ export async function reconcileByDateRange(
   startDate: string,
   endDate: string,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   console.log("--- INICIANDO PROCESO ---", { startDate, endDate });
 

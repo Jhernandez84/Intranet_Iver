@@ -13,7 +13,7 @@ import { useState, useEffect, useRef } from "react";
 import { useUser } from "../../../../context/UserProvider";
 import { useCompanyBranchesAccess } from "../../../../context/CompanyBranchesProvider";
 import { useFinanceMovementsType } from "../../_Context/FinancesMovementsProvider";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../../lib/supabase/client";
 import { useFinanceData } from "../../_Context/FinancesProvider";
 // import { fetchMovementDetail } from "./CRUD_Finance_Forms"; // Asumo que lo usas en otro lado
 
@@ -88,7 +88,7 @@ export default function FinanceEntryDataForm({
     : [];
 
   const { refreshFinanceMovements } = useFinanceData();
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const [form, setForm] = useState<FinanceEntryForm>(initialValues);
   const [selectedDate, setSelectedDate] = useState<Date>(() => {

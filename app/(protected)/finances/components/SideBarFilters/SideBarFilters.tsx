@@ -3,7 +3,7 @@
 // app/components/Navbar.tsx
 import React, { useState } from "react";
 import Link from "next/link";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../../lib/supabase/client";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useUserAccess } from "../../../../context/UserAccessProvider";
@@ -15,7 +15,7 @@ import { initFlowbite } from "flowbite";
 const SideBarFilters = () => {
   const pathname = usePathname();
 
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const router = useRouter();
 
   const { access, isLoadingAccess } = useUserAccess();

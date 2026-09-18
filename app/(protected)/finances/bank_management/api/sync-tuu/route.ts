@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../../../lib/supabase/server";
 
 // Definimos la interfaz basada en la respuesta que esperas de la API de Tuu
 interface TuuApiTransaction {
@@ -17,7 +17,7 @@ interface TuuApiResponse {
 }
 
 export async function GET() {
-  const supabase = createClientComponentClient();
+  const supabase = await createClient();
   // Nota: Asegúrate de que esta URL sea la correcta según tu documentación de Haulmer/Tuu
   const TUU_API_URL = "https://api.tuu.cl/v1/export/transactions";
 

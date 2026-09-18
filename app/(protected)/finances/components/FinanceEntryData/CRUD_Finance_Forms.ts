@@ -1,4 +1,4 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../../lib/supabase/client";
 
 export type MovementDetail = {
   company_id: string;
@@ -12,7 +12,7 @@ export async function fetchMovementDetail(
   movementId: string,
 ): Promise<MovementDetail | null> {
   try {
-    const supabase = createClientComponentClient();
+    const supabase = createClient();
 
     const query = supabase
       .from("tipos_movimiento")

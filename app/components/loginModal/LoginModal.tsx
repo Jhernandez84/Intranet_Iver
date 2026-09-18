@@ -1,10 +1,10 @@
 "use client";
 import { useEffect } from "react";
 import { initFlowbite } from "flowbite";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../lib/supabase/client";
 
 export default function LoginModal() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     initFlowbite();

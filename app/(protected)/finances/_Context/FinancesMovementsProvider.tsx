@@ -7,7 +7,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../lib/supabase/client";
 import { useUser } from "../../../context/UserProvider";
 
 interface FinanceMovements {
@@ -57,7 +57,7 @@ export const CompanyFinanceMovementsTypeProvider = ({
     FinanceMovements[] | null
   >(null);
 
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const getFinanceMovementsTypes = async () => {
     if (isLoading || !user) return;

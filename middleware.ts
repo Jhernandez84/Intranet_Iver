@@ -1,34 +1,6 @@
-// import { NextResponse } from "next/server";
-// import type { NextRequest } from "next/server";
-// import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
-
-// // export const config = {
-// //   matcher: ["/finances/:path*", "/admin/:path*", "/dashboard/:path*", "/coffee/:path*"], // y más si necesitas
-// // };
-
-// export async function middleware(req: NextRequest) {
-//   const res = NextResponse.next();
-//   const supabase = createMiddlewareClient({ req, res });
-
-//   const url = req.nextUrl;
-//   const hasCode = url.searchParams.has("code");
-
-//   const {
-//     data: { session },
-//   } = await supabase.auth.getSession();
-
-//   // 👇 Permitir pasar si viene con ?code= (OAuth en proceso)
-//   if (!session && url.pathname.startsWith("/myaccount") && !hasCode) {
-//     return NextResponse.redirect(new URL("/", req.url));
-//   }
-
-//   return res;
-// }
-
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
+import { createMiddlewareClient } from "./app/lib/supabase/middleware";
 
 // 💡 Solo rutas protegidas (tu selección)
 export const config = {
@@ -46,44 +18,39 @@ export const config = {
   ],
 };
 
-// 👇 prefijos que deben ser SIEMPRE públicos (sin login)
-const PUBLIC_SUBPATHS = [
-  "/forms/live", // incluye /forms/liveforms y cualquier subruta
-  "/forms/workspace/", // incluye /forms/liveforms y cualquier subruta
-  // agrega más si necesitas, p.ej:
-  // "/calendar/public",
-];
-
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const pathname = url.pathname;
 
-  // 0) Deja pasar subrutas públicas sin validar nada
-  if (PUBLIC_SUBPATHS.some((p) => pathname.startsWith(p))) {
+  // 0) Deja pasar la página pública de formularios (/forms/f/[slug]) sin
+  // validar sesión — comprobación por segmento exacto, no por prefijo, para
+  // no capturar accidentalmente otras rutas de /forms/*.
+  const segments = pathname.split("/").filter(Boolean);
+  const isPublicForm = segments[0] === "forms" && segments[1] === "f";
+  if (isPublicForm) {
     return NextResponse.next();
   }
 
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
+  const { supabase, response } = createMiddlewareClient(req);
 
   const hasCode = url.searchParams.has("code");
 
-  // 1) Sesión
+  // 1) Sesión (getUser revalida contra Supabase Auth y refresca la cookie;
+  // getSession solo leería la cookie, posiblemente vieja)
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Si no hay sesión:
   // - deja pasar si viene con ?code (OAuth en proceso)
   // - si no, redirige al home (o /login si prefieres)
-  if (!session) {
-    if (hasCode) return res;
+  if (!user) {
+    if (hasCode) return response;
     return NextResponse.redirect(new URL("/", req.url));
   }
 
   // 2) Access list desde user_metadata
-  const rawAccess = session.user.user_metadata?.access;
-  console.log("accesos en metadata", rawAccess);
+  const rawAccess = user.user_metadata?.access;
   const accessList: string[] = Array.isArray(rawAccess) ? rawAccess : [];
 
   // Si no hay permisos definidos, no autorizado
@@ -93,8 +60,7 @@ export async function middleware(req: NextRequest) {
 
   // 3) Determinar la "app" desde el primer segmento
   //    /finances/x/y  -> "finances"
-  const firstSegment = url.pathname.split("/").filter(Boolean)[0] ?? "";
-  const app = firstSegment.toLowerCase();
+  const app = (segments[0] ?? "").toLowerCase();
 
   // 4) Regla: acceso si
   //   - la lista incluye el nombre de la app, o
@@ -108,5 +74,5 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  return res;
+  return response;
 }

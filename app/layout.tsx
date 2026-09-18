@@ -2,8 +2,7 @@ import { ThemeModeScript } from "flowbite-react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeInit } from "../.flowbite-react/init";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "./lib/supabase/server";
 import Navbar from "./components/navbar/Navbar";
 
 import { UserProvider } from "./context/UserProvider";
@@ -34,7 +33,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = await createClient();
   const {
     data: { user },
     error,

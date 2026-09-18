@@ -1,13 +1,13 @@
 // actions/reports.ts
 "use client";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../lib/supabase/client";
 
 export async function getMonthlyReportRPC(
   companyId: string,
   fromDate: string,
   toDate: string,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const { data, error } = await supabase.rpc("get_revenue_report_by_sede", {
     p_company_id: companyId,
@@ -28,7 +28,7 @@ export async function getOperationalReportRPC(
   fromDate: string,
   toDate: string,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   // DEBUG: Verifica en tu terminal de VS Code que los valores sean correctos
   console.log("🚀 Llamando RPC con:", { companyId, fromDate, toDate });

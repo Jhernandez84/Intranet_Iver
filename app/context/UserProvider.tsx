@@ -8,7 +8,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"; // O @supabase/ssr
+import { createClient } from "../lib/supabase/client";
 
 // 1. Define el tipo de datos para el usuario
 interface UserData {
@@ -45,7 +45,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     const loadUser = async () => {

@@ -1,8 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../lib/supabase/client";
 
 // Sustituye con tus variables de entorno o cliente configurado
-const supabase = createClientComponentClient();
+const supabase = createClient();
 
 // Interfaz estricta para la respuesta del RPC
 export interface GatewayReportRow {

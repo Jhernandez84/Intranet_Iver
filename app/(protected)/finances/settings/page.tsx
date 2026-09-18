@@ -5,9 +5,9 @@ import { useUser } from "../../../context/UserProvider";
 import CardComponent from "../components/CardComponent/CardComponent";
 // import { useFinanceData } from "../_Context/FinancesProvider";
 import { useFinanceMovementsType } from "../_Context/FinancesMovementsProvider";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../lib/supabase/client";
 
-const supabase = createClientComponentClient();
+const supabase = createClient();
 
 interface MovementType {
   id: string;

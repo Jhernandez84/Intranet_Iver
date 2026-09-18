@@ -8,7 +8,7 @@ import {
   useMemo,
   ReactNode,
 } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../lib/supabase/client";
 import { useUser } from "../../../context/UserProvider";
 import { useCallback } from "react";
 
@@ -65,7 +65,7 @@ export const CompanyFinanceProvider = ({
   children: ReactNode;
 }) => {
   const { user, isLoading } = useUser();
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const [isLoadingFinanceData, setIsLoadingFinanceData] = useState(true);
   const [rawMovements, setRawMovements] = useState<FinanceMovements[] | null>(

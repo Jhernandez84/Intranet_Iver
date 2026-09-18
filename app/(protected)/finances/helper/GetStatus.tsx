@@ -1,7 +1,7 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../../lib/supabase/client";
 
 export async function getSyncStatus(companyId: string) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   // 1. Máximo de bank_movements (General)
   const { data: maxBankMov } = await supabase

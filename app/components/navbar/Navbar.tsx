@@ -7,12 +7,12 @@ import { useEffect, useState } from "react";
 import AppsMenu from "../../(protected)/components/apps/Apps";
 import Apps2Menu from "../../(protected)/components/apss22/Apps2";
 import NotificationList from "../../(protected)/components/notifications/notifications";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "../../lib/supabase/client";
 import AuthButton from "../authcomponents/AuthButton";
 
 const Navbar = () => {
   const [spuser, setspUser] = useState(null);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     // Escucha los cambios de estado de la autenticación

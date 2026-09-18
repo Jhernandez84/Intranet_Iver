@@ -8,7 +8,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"; // O @supabase/ssr
+import { createClient } from "../lib/supabase/client";
 import { useUser } from "./UserProvider";
 
 // 1. Define el tipo de datos para el usuario
@@ -43,7 +43,7 @@ export const CompanyProvider = ({ children }: { children: ReactNode }) => {
 
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     // Función para cargar los datos del usuario
