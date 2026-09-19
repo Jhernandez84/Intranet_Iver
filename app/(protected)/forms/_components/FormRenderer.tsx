@@ -35,6 +35,8 @@ export interface FormRendererProps {
   themeColor?: string | null;
   /** Sin pantalla de bienvenida ni de confirmación — para el alta manual interna del staff. */
   simple?: boolean;
+  /** Si es false, se salta la pantalla "revisa tus respuestas" y envía directo. */
+  showReview?: boolean;
 }
 
 type Stage = "welcome" | "form" | "review" | "success";
@@ -56,6 +58,7 @@ export default function FormRenderer({
   coverSubtitle,
   themeColor,
   simple = false,
+  showReview = true,
 }: FormRendererProps) {
   const heading = coverTitle || formName;
   const hasWelcome = !simple && !!(coverImageUrl || heading || coverSubtitle);
@@ -103,7 +106,7 @@ export default function FormRenderer({
 
   const handleReachEnd = handleSubmit(
     async (values) => {
-      if (simple) {
+      if (simple || !showReview) {
         await doSubmit(values);
         return;
       }
@@ -302,7 +305,7 @@ export default function FormRenderer({
 
           {isLastStep ? (
             <Button style={accentStyle} type="submit">
-              Revisar respuestas
+              {simple || !showReview ? submitLabel : "Revisar respuestas"}
             </Button>
           ) : (
             <Button style={accentStyle} type="button" onClick={goNext}>
@@ -348,7 +351,7 @@ export default function FormRenderer({
         <Button style={accentStyle} type="submit" disabled={submitting}>
           {submitting
             ? "Enviando..."
-            : simple
+            : simple || !showReview
               ? submitLabel
               : "Revisar respuestas"}
         </Button>

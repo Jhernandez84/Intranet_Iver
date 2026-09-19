@@ -78,6 +78,7 @@ export interface UpdateFormInput {
   closesAt: string | null;
   price: number | null;
   themeColor: string | null;
+  showReview: boolean;
 }
 
 export async function updateForm(formId: string, input: UpdateFormInput) {
@@ -109,6 +110,7 @@ export async function updateForm(formId: string, input: UpdateFormInput) {
       closes_at: input.closesAt,
       price: input.price,
       theme_color: input.themeColor,
+      show_review: input.showReview,
       updated_at: new Date().toISOString(),
     })
     .eq("id", formId);
@@ -153,6 +155,7 @@ export async function duplicateForm(formId: string) {
       redirect_message: original.redirect_message,
       price: original.price,
       theme_color: original.theme_color,
+      show_review: original.show_review,
       created_by: userId,
     })
     .select("id")

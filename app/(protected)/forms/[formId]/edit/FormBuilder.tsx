@@ -158,6 +158,7 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
         closesAt: form.closesAt,
         price: form.price,
         themeColor: form.themeColor,
+        showReview: form.showReview,
       });
       setForm((prev) => ({ ...prev, status: nextStatus }));
       showToast(
@@ -275,6 +276,10 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
       )}
 
       {activeTab === "ajustes" && (
+        // Se "escapa" del contenedor angosto de la página (max-w-3xl) para
+        // ocupar ~95% del ancho real de la pantalla, sin afectar los tabs
+        // Crear/Publicar que sí quieren quedarse en un ancho más acotado.
+        <div className="relative left-1/2 w-[95vw] max-w-[1700px] -translate-x-1/2">
         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <section className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="text-xs font-semibold text-gray-400 uppercase">
@@ -430,6 +435,18 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
             <h3 className="text-xs font-semibold text-gray-400 uppercase">
               Después de enviar
             </h3>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="show-review"
+                checked={form.showReview}
+                onChange={(e) =>
+                  setForm({ ...form, showReview: e.target.checked })
+                }
+              />
+              <Label htmlFor="show-review">
+                Mostrar resumen de respuestas antes de enviar
+              </Label>
+            </div>
             <div>
               <Label htmlFor="success-title">
                 Título del mensaje de agradecimiento
@@ -626,6 +643,7 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
             </div>
           </section>
         </div>
+        </div>
       )}
 
       {activeTab === "publicar" && (
@@ -685,6 +703,7 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
                 coverTitle={form.coverTitle}
                 coverSubtitle={form.coverSubtitle}
                 themeColor={form.themeColor}
+                showReview={form.showReview}
               />
             </div>
           ) : (
@@ -696,6 +715,7 @@ export default function FormBuilder({ initialForm }: FormBuilderProps) {
               coverTitle={form.coverTitle}
               coverSubtitle={form.coverSubtitle}
               themeColor={form.themeColor}
+              showReview={form.showReview}
             />
           )}
         </ModalBody>

@@ -49,6 +49,7 @@ export interface FormDefinition {
   closesAt: string | null;
   price: number | null;
   themeColor: string | null;
+  showReview: boolean;
 }
 
 export interface FormResponseRow {
@@ -88,6 +89,7 @@ export interface FormRow {
   closes_at: string | null;
   price: number | null;
   theme_color: string | null;
+  show_review: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -131,5 +133,6 @@ export function formRowToDefinition(row: FormRow): FormDefinition {
     closesAt: row.closes_at,
     price: row.price,
     themeColor: row.theme_color,
+    showReview: row.show_review,
   };
 }

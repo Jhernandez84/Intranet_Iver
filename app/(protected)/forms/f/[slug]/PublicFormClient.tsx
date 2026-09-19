@@ -18,6 +18,7 @@ interface PublicFormClientProps {
   coverTitle?: string | null;
   coverSubtitle?: string | null;
   themeColor?: string | null;
+  showReview?: boolean;
 }
 
 export default function PublicFormClient({
@@ -34,6 +35,7 @@ export default function PublicFormClient({
   coverTitle,
   coverSubtitle,
   themeColor,
+  showReview,
 }: PublicFormClientProps) {
   const handleSubmit = async (answers: Record<string, unknown>) => {
     const result = await submitPublicResponse(slug, answers);
@@ -58,6 +60,7 @@ export default function PublicFormClient({
       coverTitle={coverTitle}
       coverSubtitle={coverSubtitle}
       themeColor={themeColor}
+      showReview={showReview}
     />
   );
 }

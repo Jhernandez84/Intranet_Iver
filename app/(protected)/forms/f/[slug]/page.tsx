@@ -101,6 +101,7 @@ export default async function PublicFormPage({
           successBody={form.success_body}
           redirectUrl={form.redirect_url}
           redirectLabel={form.redirect_label}
+          showReview={form.show_review}
           paged={isCard}
           formName={form.name}
           coverImageUrl={form.cover_image_url}
